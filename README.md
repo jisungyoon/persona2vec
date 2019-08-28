@@ -20,15 +20,18 @@ You can easily make the edgelist file(*.elist) with networkx function [nx.write_
 or you can just use function read_graph in utils.
 
 ### Outputs
-There are 4 outputs on persona2vec
+There are 3 outputs on persona2vec
 
 1. Persona network
+
   Persona network is a result graph of ego-splitting. File format is edgelist(*.elist), which is same to format of inputs
   
 2. persona to node, node to persona mapping
+
   mappings is a dict that connnect orginal node and splitted persona nodes or vice versa. Bascially, relation between node and persona is 1 to M relations. File format is pickle(*.pkl)
   
 3. Persona embedding
+
   Result embedding of Spitter on persona graph. This embedding is final results of this resposiotry. File format is pickle(.pkl).
 
 ## Use as source code
