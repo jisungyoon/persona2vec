@@ -86,7 +86,7 @@ python src/main.py --number-of-walks 20 --walk-length 80
 ## Use as library
 You can use persona2vec as library.
 ```
-  python libs/setup.py install
+python libs/setup.py install
 ```
 Check a exmaple notebook, example_karate.ipynb
 
