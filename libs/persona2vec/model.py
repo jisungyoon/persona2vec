@@ -43,7 +43,7 @@ class Persona2Vec(Node2Vec):
         self.original_network = G
         self.lambd = lambd
         
-        splitter = EgoNetSplitter(self.original_network, self.lambd)
+        splitter = EgoNetSplitter(self.original_network, directed=directed, lambd=self.lambd)
         self.persona_network = splitter.persona_network
         self.social_network = splitter.social_network # to check how method works, it can be deleted afterwards.
         self.node_to_persona = splitter.personalities
