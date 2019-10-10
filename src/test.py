@@ -10,6 +10,7 @@ def main():
     Reading data, embedding base graph, creating persona graph and learning a splitter.
     saving the persona mapping and the embedding.
     """
+    output_file_name = 'result.tsv'
     name = 'ca-HepTh.elist'
     G = read_graph('graph/' + name)
     
@@ -20,6 +21,7 @@ def main():
     test_object.calculate_link_prediction_score()
     test_object.calculate_ROC_AUC_value()
     test_object.print_result()
+    test_object.write_result(output_file_name)
 
 if __name__ == "__main__":
     main()

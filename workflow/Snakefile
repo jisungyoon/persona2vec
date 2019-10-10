@@ -1,0 +1,35 @@
+from os.path import join as osjoin
+import numpy as np
+
+# Main paths
+PROJ_HOME = open('PROJ_HOME_DIR').read().strip()
+DATA_DIR = osjoin(PROJ_HOME, 'graph')
+
+
+
+# Raw datasets
+NETWORK_FILES = osjoin(DATA_DIR, '{file_name}.elist')
+FILE_LIST = ['ca-HepTh.elist']
+LAMBDS = np.linspace(0,1,10)
+DIMS = [8, 16, 32, 64]
+
+# Computation envirioment
+RESULT_FILE = osjoin(PROJ_HOME, 'result.tsv')
+        
+
+rule all:
+    input: 
+         RESULT_FILE
+
+
+
+rule link_prediction:                                                              
+    input: 
+        expand(NETWORK_FILES,file_name=FILE_LIST)),
+    output: 
+        RESULT_FILE               
+    run:
+        prev_year = None
+        for lambd in LAMBDS:
+            for dim in IMDS:
+                shell('echo {lambd} {dim}')

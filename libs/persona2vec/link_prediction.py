@@ -3,8 +3,7 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import auc
 
-from model import Persona2Vec
-
+from persona2vec.model import Persona2Vec
 
 import logging
 
