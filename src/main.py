@@ -1,5 +1,5 @@
 import argparse
-from persona2vec import Persona2Vec
+from model import Persona2Vec
 from utils import tab_printer, read_graph
 
 
