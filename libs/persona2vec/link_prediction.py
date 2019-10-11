@@ -72,8 +72,8 @@ class linkPredictionTask(object):
         
         
     def calculate_link_prediction_score(self):
-        self.link_prediction_score_postive = self.calculate_score(self.test_edges)
-        self.link_prediction_score_negative = self.calculate_score(self.negative_edges)
+        self.link_prediction_score_postive = np.array(self.calculate_score(self.test_edges))
+        self.link_prediction_score_negative = np.array(self.calculate_score(self.negative_edges))
         
     def calculate_score(self, edge_list):
         score_list = []
@@ -97,10 +97,10 @@ class linkPredictionTask(object):
         _min = min([min(self.link_prediction_score_postive),min(self.link_prediction_score_negative)])
         _max = max([max(self.link_prediction_score_postive),max(self.link_prediction_score_negative)])
         for th in tqdm(np.linspace(_min, _max, 1000)):
-            TP = sum(self.link_prediction_score_postive >= th)
-            FN = sum(self.link_prediction_score_postive < th)
-            FP = sum(self.link_prediction_score_negative > th)
-            TN = sum(self.link_prediction_score_negative <= th)
+            TP = len(np.where(self.link_prediction_score_postive >= th)[0])
+            FN = len(self.link_prediction_score_postive) - TP
+            FP = len(np.where(self.link_prediction_score_negative> th)[0])
+            TN = len(self.link_prediction_score_negative) - FP
             TPR = TP / (TP + FN)
             FPR = FP / (TN + FP)
 
@@ -119,6 +119,3 @@ class linkPredictionTask(object):
         f = open(file_name, 'a')
         f.write('\t'.join([self.name, str(self.lambd), str(self.dimensions), str(self.ROC_AUC_value)]) + '\n')
         f.close()
-        
-        
-            

@@ -8,9 +8,9 @@ DATA_DIR = osjoin(PROJ_HOME, 'graph')
 
 
 # Raw datasets
-NETWORK_FILES = osjoin(DATA_DIR, '{file_name}.elist')
 FILE_LIST = ['ca-HepTh.elist']
-LAMBDS = np.linspace(0,1,10)
+FILE_DIRS = [osjoin(DATA_DIR, file) for file in FILE_LIST]
+LAMBDS = np.linspace(0.1,1,10)
 DIMS = [8, 16, 32, 64]
 
 # Computation envirioment
@@ -22,14 +22,14 @@ rule all:
          RESULT_FILE
 
 
-
 rule link_prediction:                                                              
     input: 
-        expand(NETWORK_FILES,file_name=FILE_LIST)),
+        FILE_DIRS
     output: 
         RESULT_FILE               
     run:
         prev_year = None
-        for lambd in LAMBDS:
-            for dim in IMDS:
-                shell('echo {lambd} {dim}')
+        for file in FILE_DIRS:
+            for lambd in LAMBDS:
+                for dim in DIMS:
+                    shell('python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim}')
