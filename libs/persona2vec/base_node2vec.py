@@ -75,7 +75,6 @@ class Node2Vec(object):
             alias_nodes[node] = alias_setup(normalized_probs)
 
         alias_edges = {}
-        triads = {}
 
         if self.directed:
             for edge in G.edges():
@@ -138,7 +137,6 @@ class Node2Vec(object):
 
         walk = [start_node]
 
-        check = True
         while len(walk) < walk_length:
             cur = walk[-1]
             cur_nbrs = sorted(G.neighbors(cur))
