@@ -75,7 +75,8 @@ class EgoNetSplitter(object):
         logging.info("Creating the persona network.")
 
         # Add social edges
-        self.social_edges = [(self.components[edge[0]][edge[1]], self.components[edge[1]][edge[0]])
+        self.social_edges = [(self.components[edge[0]][edge[1]],
+                              self.components[edge[1]][edge[0]])
                              for edge in tqdm(self.network.edges())]
         if self.directed:
             G = nx.from_edgelist(self.social_edges, create_using=nx.DiGraph())
