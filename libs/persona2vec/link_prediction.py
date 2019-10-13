@@ -40,13 +40,13 @@ class linkPredictionTask(object):
             edge_list = np.array(self.G.edges())
             candidate_idxs = np.random.choice(
                 len(edge_list), self.number_of_test_edges - count, replace=False)
-            for src, tar in tqdm(edge_list[candidate_idxs]):
-                self.G.remove_edge(src, tar)
+            for source, target in tqdm(edge_list[candidate_idxs]):
+                self.G.remove_edge(source, target)
                 if nx.is_connected(self.G):
                     count += 1
-                    self.test_edges.append((src, tar))
+                    self.test_edges.append((source, target))
                 else:
-                    self.G.add_edge(src, tar, weight=1)
+                    self.G.add_edge(source, target, weight=1)
 
     def generate_negative_edges(self):
         count = 0
