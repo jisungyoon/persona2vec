@@ -6,30 +6,30 @@ PROJ_HOME = open('PROJ_HOME_DIR').read().strip()
 DATA_DIR = osjoin(PROJ_HOME, 'graph')
 
 
-
 # Raw datasets
 FILE_LIST = ['ca-HepTh.elist']
 FILE_DIRS = [osjoin(DATA_DIR, file) for file in FILE_LIST]
-LAMBDS = np.linspace(0.1,1,10)
+LAMBDS = np.linspace(0.1, 1, 10)
 DIMS = [8, 16, 32, 64]
 
 # Computation envirioment
 RESULT_FILE = osjoin(PROJ_HOME, 'result.tsv')
-        
+
 
 rule all:
-    input: 
-         RESULT_FILE
+    input:
+        RESULT_FILE
 
 
-rule link_prediction:                                                              
-    input: 
+rule link_prediction:
+    input:
         FILE_DIRS
-    output: 
-        RESULT_FILE               
+    output:
+        RESULT_FILE
     run:
         prev_year = None
         for file in FILE_DIRS:
             for lambd in LAMBDS:
                 for dim in DIMS:
-                    shell('python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim}')
+                    shell(
+                        'python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim}')
