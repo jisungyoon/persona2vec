@@ -24,9 +24,9 @@ def read_graph(input_file_path, weighted=False, directed=False):
     :param directed: directed network(True) or undirected network(False)
     '''
     if weighted:
-        G = nx.read_edgelist(input_file_path, nodetype=str, data=(
-            ('weight', float),), create_using=nx.DiGraph())
-
+        G = nx.read_edgelist(input_file_path, nodetype=str,
+                             data=(('weight', float),),
+                             create_using=nx.DiGraph())
     else:
         G = nx.read_edgelist(input_file_path, nodetype=str,
                              create_using=nx.DiGraph())
