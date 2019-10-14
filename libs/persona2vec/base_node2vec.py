@@ -68,7 +68,7 @@ class Node2Vec(object):
         alias_nodes = {}
         for node in G.nodes():
             unnormalized_probs = [G[node][nbr]['weight']
-                                  for nbr in sorted(G.neighbors(node))]
+                                  for nbr in G.neighbors(node)]
             norm_const = sum(unnormalized_probs)
             normalized_probs = [
                 float(u_prob) / norm_const for u_prob in unnormalized_probs]
