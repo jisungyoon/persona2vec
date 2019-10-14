@@ -1,8 +1,5 @@
-import numpy as np
-import networkx as nx
-import random
-from tqdm import tqdm
 import pickle
+import networkx as nx
 
 from persona2vec.base_node2vec import Node2Vec
 from persona2vec.ego_splitting import EgoNetSplitter
@@ -16,8 +13,9 @@ class Persona2Vec(Node2Vec):
     """
     Persona2Vec node embedding object
     """
+
     def __init__(self, G,
-                 lambd = 0.1,
+                 lambd=0.1,
                  directed=False,
                  num_walks=10,
                  walk_length=80,
@@ -42,14 +40,16 @@ class Persona2Vec(Node2Vec):
         """
         self.original_network = G
         self.lambd = lambd
-        
-        splitter = EgoNetSplitter(self.original_network, directed=directed, lambd=self.lambd)
+
+        splitter = EgoNetSplitter(
+            self.original_network, directed=directed, lambd=self.lambd)
         self.persona_network = splitter.persona_network
-        self.social_network = splitter.social_network # to check how method works, it can be deleted afterwards.
+        # to check how method works, it can be deleted afterwards.
+        self.social_network = splitter.social_network
         self.node_to_persona = splitter.personalities
         self.persona_to_node = splitter.personality_map
         del splitter
-        
+
         super().__init__(self.persona_network,
                          directed=directed,
                          num_walks=num_walks,
@@ -60,18 +60,14 @@ class Persona2Vec(Node2Vec):
                          window_size=window_size,
                          base_iter=base_iter,
                          workers=workers)
-        
-        
+
     def save_persona_network(self, file_name):
         nx.write_edgelist(self.persona_network, file_name)
-            
-            
+
     def save_persona_to_node_mapping(self, file_name):
         with open(file_name, 'wb') as f:
             pickle.dump(self.persona_to_node, f)
-        
-        
+
     def save_node_to_persona_mapping(self, file_name):
         with open(file_name, 'wb') as f:
             pickle.dump(self.node_to_persona, f)
-                    

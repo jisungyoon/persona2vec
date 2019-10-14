@@ -10,8 +10,9 @@ def tab_printer(args):
     """
     args = vars(args)
     keys = sorted(args.keys())
-    t = Texttable() 
-    t.add_rows([["Parameter", "Value"]] +  [[k.replace("_", " ").capitalize(), args[k]] for k in keys])
+    t = Texttable()
+    t.add_rows([["Parameter", "Value"]] +
+               [[k.replace("_", " ").capitalize(), args[k]] for k in keys])
     print(t.draw())
 
 
@@ -23,10 +24,12 @@ def read_graph(input_file_path, weighted=False, directed=False):
     :param directed: directed network(True) or undirected network(False)
     '''
     if weighted:
-        G = nx.read_edgelist(input_file_path, nodetype=str, data=(('weight', float),), create_using=nx.DiGraph())
-        
+        G = nx.read_edgelist(input_file_path, nodetype=str,
+                             data=(('weight', float),),
+                             create_using=nx.DiGraph())
     else:
-        G = nx.read_edgelist(input_file_path, nodetype=str, create_using=nx.DiGraph())
+        G = nx.read_edgelist(input_file_path, nodetype=str,
+                             create_using=nx.DiGraph())
         for edge in G.edges():
             G[edge[0]][edge[1]]['weight'] = 1
 
