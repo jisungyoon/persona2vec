@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 from tqdm import tqdm
-from sklearn.metrics import auc
+from sklearn.metrics import roc_auc_score
 
 from persona2vec.model import Persona2Vec
 
@@ -17,7 +17,9 @@ class linkPredictionTask(object):
                  num_walks=10,
                  walk_length=40,
                  dimensions=16,
-                 window_size=5):
+                 window_size=5,
+				 workers=4,
+				 base_iter=10):
         self.G = G
         self.name = name
         self.lambd = lambd
@@ -25,6 +27,8 @@ class linkPredictionTask(object):
         self.walk_length = walk_length
         self.dimensions = dimensions
         self.window_size = window_size
+		self.workers = workers
+		self.base_iter = base_iter
 
         self.original_edge_set = set(G.edges)
         self.node_list = list(G.nodes)
@@ -66,7 +70,9 @@ class linkPredictionTask(object):
                                  num_walks=self.num_walks,
                                  walk_length=self.walk_length,
                                  dimensions=self.dimensions,
-                                 window_size=self.window_size)
+                                 window_size=self.window_size,
+								 workers=self.workers,
+								 base_iter=self.base_iter)
         self.model.simulate_walks()
         self.emb = self.model.learn_embedding()
 
@@ -88,26 +94,9 @@ class linkPredictionTask(object):
 
     def calculate_ROC_AUC_value(self):
         logging.info('Calcualte ROC_AUC values')
-        self.calculate_ROC_curve()
-        self.ROC_AUC_value = auc(self.FPRS, self.TPRS)
-
-    def calculate_ROC_curve(self):
-        self.TPRS = []
-        self.FPRS = []
-        _min = min([min(self.link_prediction_score_postive),
-                    min(self.link_prediction_score_negative)])
-        _max = max([max(self.link_prediction_score_postive),
-                    max(self.link_prediction_score_negative)])
-        for th in tqdm(np.linspace(_min, _max, 1000)):
-            TP = len(np.where(self.link_prediction_score_postive >= th)[0])
-            FN = len(self.link_prediction_score_postive) - TP
-            FP = len(np.where(self.link_prediction_score_negative > th)[0])
-            TN = len(self.link_prediction_score_negative) - FP
-            TPR = TP / (TP + FN)
-            FPR = FP / (TN + FP)
-
-            self.TPRS.append(TPR)
-            self.FPRS.append(FPR)
+		y_true = np.concatenate([np.ones_like(test_object.link_prediction_score_postive), np.zeros_like(test_object.link_prediction_score_negative)])
+		y_score = np.concatenate([test_object.link_prediction_score_postive, test_object.link_prediction_score_negative], axis=0)
+		self.ROC_AUC_value = roc_auc_score(y_true, y_score)
 
     def print_result(self):
         logging.info(self.name)
