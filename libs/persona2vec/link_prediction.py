@@ -19,7 +19,7 @@ class linkPredictionTask(object):
                  dimensions=16,
                  window_size=5,
 				 workers=4,
-				 base_iter=10):
+				 base_iter=5):
         self.G = G
         self.name = name
         self.lambd = lambd
@@ -94,8 +94,8 @@ class linkPredictionTask(object):
 
     def calculate_ROC_AUC_value(self):
         logging.info('Calcualte ROC_AUC values')
-        y_true = np.concatenate([np.ones_like(test_object.link_prediction_score_postive), np.zeros_like(test_object.link_prediction_score_negative)])
-        y_score = np.concatenate([test_object.link_prediction_score_postive, test_object.link_prediction_score_negative], axis=0)
+        y_true = np.concatenate([np.ones_like(self.link_prediction_score_postive), np.zeros_like(self.link_prediction_score_negative)])
+        y_score = np.concatenate([self.link_prediction_score_postive, self.link_prediction_score_negative], axis=0)
         self.ROC_AUC_value = roc_auc_score(y_true, y_score)
 
     def print_result(self):
