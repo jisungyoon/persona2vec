@@ -1,4 +1,5 @@
 from os.path import join as osjoin
+from itertools import product
 import numpy as np
 
 # Main paths
@@ -13,6 +14,7 @@ LAMBDS = np.linspace(0.1, 1, 10)
 DIMS = [8, 16, 32, 64]
 
 # Computation envirioment
+REPETITION = 10
 RESULT_FILE = osjoin(PROJ_HOME, 'result.tsv')
 
 
@@ -27,9 +29,5 @@ rule link_prediction:
     output:
         RESULT_FILE
     run:
-        prev_year = None
-        for file in FILE_DIRS:
-            for lambd in LAMBDS:
-                for dim in DIMS:
-                    shell(
-                        'python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim}')
+        for file, lambd, dim in product(*[FILE_DIRS, LAMBDS, DIMS]):
+            shell('python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim} {REPETITION}')
