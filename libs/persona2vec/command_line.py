@@ -8,32 +8,35 @@ def parse_args():
     Parses the Splitter arguments.
     '''
     parser = argparse.ArgumentParser(description="Run splitter with node2vec")
-    
-    ## input and output files
+
+    # input and output files
     parser.add_argument('--input', nargs='?', default='examples/graph/karate.elist',
                         help='Input network path as edgelist format')
-    
-    parser.add_argument("--persona-network", nargs = "?", default = "examples/graph/karate_persona.elist",
-                        help = "Persona network path.")
-    
-    parser.add_argument("--persona-to-node", nargs = "?", default = "examples/mapping/karate_persona_to_node.pkl",
-                        help = "Persona to node mapping file.")
-    
-    parser.add_argument("--node-to-persona", nargs = "?", default = "examples/mapping/karate_node_to_persona.pkl",
-                        help = "Node to persona mapping file.")
-  
+
+    parser.add_argument("--persona-network", nargs="?",
+                        default="examples/graph/karate_persona.elist",
+                        help="Persona network path.")
+
+    parser.add_argument("--persona-to-node", nargs="?",
+                        default="examples/mapping/karate_persona_to_node.pkl",
+                        help="Persona to node mapping file.")
+
+    parser.add_argument("--node-to-persona", nargs="?",
+                        default="examples/mapping/karate_node_to_persona.pkl",
+                        help="Node to persona mapping file.")
+
     parser.add_argument('--emb', nargs='?', default='examples/emb/karate.pkl',
                         help='Persona Embeddings path')
-    
-    ## hyper-parameter of ego-splitting
-    
+
+    # hyper-parameter of ego-splitting
+
     parser.add_argument("--lambd",
-                        type = float,
-                        default = 0.1,
-                        help = "Edge weight for persona edge, usually 0~1.")
-    
-    ## hyper-parameter for learning embedding
-    
+                        type=float,
+                        default=0.1,
+                        help="Edge weight for persona edge, usually 0~1.")
+
+    # hyper-parameter for learning embedding
+
     parser.add_argument('--dimensions', type=int, default=128,
                         help='Number of dimensions. Default is 128.')
 
@@ -48,37 +51,32 @@ def parse_args():
 
     parser.add_argument('--base_iter', type=int, default=1,
                         help='Number of epochs in base embedding')
-    
+
     parser.add_argument('--p', type=float, default=1,
                         help='Return hyperparameter for random-walker. Default is 1.')
 
     parser.add_argument('--q', type=float, default=1,
                         help='Inout hyperparameter for random-walker. Default is 1.')
-    
-    
-    
-    ## computation configuration
+
+    # computation configuration
     parser.add_argument('--workers', type=int, default=8,
                         help='Number of parallel workers. Default is 8.')
 
-    
-    ## parameters for input graph type
+    # parameters for input graph type
     parser.add_argument('--weighted', dest='weighted', action='store_true',
                         help='Boolean specifying (un)weighted. Default is unweighted.')
-    parser.add_argument('--unweighted', dest='unweighted', action='store_false')
+    parser.add_argument('--unweighted', dest='unweighted',
+                        action='store_false')
     parser.set_defaults(weighted=False)
 
     parser.add_argument('--directed', dest='directed', action='store_true',
                         help='Graph is (un)directed. Default is undirected.')
-    parser.add_argument('--undirected', dest='undirected', action='store_false')
-                           
+    parser.add_argument('--undirected', dest='undirected',
+                        action='store_false')
+
     parser.set_defaults(directed=False)
 
     return parser.parse_args()
-
-
-
-
 
 
 def main():
@@ -100,14 +98,15 @@ def main():
                         window_size=args.window_size,
                         base_iter=args.base_iter,
                         workers=args.workers)
-    
+
     model.simulate_walks()
     model.learn_embedding()
-    
+
     model.save_persona_network(args.persona_network)
     model.save_persona_to_node_mapping(args.persona_to_node)
     model.save_node_to_persona_mapping(args.node_to_persona)
     model.save_embedding(args.emb)
+
 
 if __name__ == "__main__":
     main()

@@ -30,4 +30,5 @@ rule link_prediction:
         RESULT_FILE
     run:
         for file, lambd, dim in product(*[FILE_DIRS, LAMBDS, DIMS]):
-            shell('python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim} {REPETITION}')
+            shell(
+                'python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim} {REPETITION}')
