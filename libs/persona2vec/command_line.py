@@ -1,6 +1,6 @@
 import argparse
-from model import Persona2Vec
-from utils import tab_printer, read_graph
+from persona2vec.model import Persona2Vec
+from persona2vec.utils import tab_printer, read_graph
 
 
 def parse_args():
@@ -10,19 +10,19 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run splitter with node2vec")
     
     ## input and output files
-    parser.add_argument('--input', nargs='?', default='graph/karate.elist',
+    parser.add_argument('--input', nargs='?', default='examples/graph/karate.elist',
                         help='Input network path as edgelist format')
     
-    parser.add_argument("--persona-network", nargs = "?", default = "graph/karate_persona.elist",
+    parser.add_argument("--persona-network", nargs = "?", default = "examples/graph/karate_persona.elist",
                         help = "Persona network path.")
     
-    parser.add_argument("--persona-to-node", nargs = "?", default = "mapping/karate_persona_to_node.pkl",
+    parser.add_argument("--persona-to-node", nargs = "?", default = "examples/mapping/karate_persona_to_node.pkl",
                         help = "Persona to node mapping file.")
     
-    parser.add_argument("--node-to-persona", nargs = "?", default = "mapping/karate_node_to_persona.pkl",
+    parser.add_argument("--node-to-persona", nargs = "?", default = "examples/mapping/karate_node_to_persona.pkl",
                         help = "Node to persona mapping file.")
   
-    parser.add_argument('--emb', nargs='?', default='emb/karate.pkl',
+    parser.add_argument('--emb', nargs='?', default='examples/emb/karate.pkl',
                         help='Persona Embeddings path')
     
     ## hyper-parameter of ego-splitting
