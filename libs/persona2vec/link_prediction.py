@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
 
+from persona2vec.utils import read_graph
 from persona2vec.model import Persona2Vec
 
 import logging
@@ -12,6 +13,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 class linkPredictionTask(object):
     def __init__(self, G,
+                 test_edges,
+                 negative_edges,
                  name,
                  lambd=0.1,
                  num_walks=10,
@@ -20,8 +23,12 @@ class linkPredictionTask(object):
                  window_size=5,
                  workers=4,
                  base_iter=5):
+             
         self.G = G
+        self.test_edges = test_edges
+        self.negative_edges = negative_edges       
         self.name = name
+        
         self.lambd = lambd
         self.num_walks = num_walks
         self.walk_length = walk_length
@@ -29,39 +36,6 @@ class linkPredictionTask(object):
         self.window_size = window_size
         self.workers = workers
         self.base_iter = base_iter
-
-        self.original_edge_set = set(G.edges)
-        self.node_list = list(G.nodes)
-        self.total_number_of_edges = len(self.original_edge_set)
-        self.number_of_test_edges = int(self.total_number_of_edges / 2)
-        self.test_edges = []
-        self.negative_edges = []
-
-    def train_test_split(self):
-        count = 0
-        logging.info('Initiate train test set split')
-        while count != self.number_of_test_edges:
-            edge_list = np.array(self.G.edges())
-            candidate_idxs = np.random.choice(
-                len(edge_list), self.number_of_test_edges - count, replace=False)
-            for source, target in tqdm(edge_list[candidate_idxs]):
-                self.G.remove_edge(source, target)
-                if nx.is_connected(self.G):
-                    count += 1
-                    self.test_edges.append((source, target))
-                else:
-                    self.G.add_edge(source, target, weight=1)
-
-    def generate_negative_edges(self):
-        count = 0
-        logging.info('Initiate generating negative edges')
-        while count != self.number_of_test_edges:
-            src, tag = np.random.choice(self.node_list, 2)
-            if (src, tag) in self.original_edge_set:
-                pass
-            else:
-                count += 1
-                self.negative_edges.append((src, tag))
 
     def learn_persona2vec_emb(self):
         logging.info('Initiate persona2vec')
