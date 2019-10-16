@@ -1,7 +1,7 @@
 import pickle
 import networkx as nx
 
-from persona2vec.base_node2vec import Node2Vec
+from persona2vec.node2vec import Node2Vec
 from persona2vec.ego_splitting import EgoNetSplitter
 
 import logging
