@@ -7,28 +7,53 @@ PROJ_HOME = open('PROJ_HOME_DIR').read().strip()
 DATA_DIR = osjoin(PROJ_HOME, 'graph')
 
 
-# Raw datasets
-FILE_LIST = ['ca-HepTh.elist']
-FILE_DIRS = [osjoin(DATA_DIR, file) for file in FILE_LIST]
+# Raw dataset
+NETWORK_LIST = ['ca-HepTh']
+INPUT_FILE_LIST = [osjoin(DATA_DIR, network_name + '.elist') for network_name in NETWORK_LIST]
+
+# Splitted dataset
+NUMBER_OF_TEST_SET = 10
+SPLITTED_FILE_DIRS = [osjoin(DATA_DIR, network_name + '_' + str(index)) for index in range(NUMBER_OF_TEST_SET) for network_name in NETWORK_LIST]
+SPLITTED_NETWORK_FILES = [osjoin(directory, 'network.elist') for directory in SPLITTED_FILE_DIRS]
+SPLITTED_TEST_EDGES_FILES = [osjoin(directory, 'test_edges.pkl') for directory in SPLITTED_FILE_DIRS]
+SPLITTED_NEGATIVE_EDGES_FILES = [osjoin(directory, 'negative_edges.pkl') for directory in SPLITTED_FILE_DIRS]
+
+REPETITION = 5
 LAMBDS = np.linspace(0.1, 1, 10)
-DIMS = [8, 16, 32, 64]
+DIMS = [8, 16, 32, 64, 128]
 
 # Computation envirioment
-REPETITION = 10
 RESULT_FILE = osjoin(PROJ_HOME, 'result.tsv')
 
 
 rule all:
     input:
         RESULT_FILE
-
-
+        
 rule link_prediction:
     input:
-        FILE_DIRS
+        SPLITTED_NETWORK_FILES,
+        SPLITTED_TEST_EDGES_FILES,
+        SPLITTED_NEGATIVE_EDGES_FILES,
     output:
         RESULT_FILE
     run:
-        for file, lambd, dim in product(*[FILE_DIRS, LAMBDS, DIMS]):
+        for network_file, test_edge, negative_edge in zip(SPLITTED_NETWORK_FILES, SPLITTED_TEST_EDGES_FILES, SPLITTED_NEGATIVE_EDGES_FILES):
+            for lambd, dim in product(*[LAMBDS, DIMS]):
+                shell(
+                    'python3 script/link_prediction.py {network_file} {test_edge} {negative_edge} {RESULT_FILE} {lambd} {dim} {REPETITION}')
+                
+                
+rule train_test_set_split:
+    input:
+        INPUT_FILE_LIST
+    output:
+        SPLITTED_NETWORK_FILES,
+        SPLITTED_TEST_EDGES_FILES,
+        SPLITTED_NEGATIVE_EDGES_FILES
+        
+    run:
+        for network_file in INPUT_FILE_LIST:
             shell(
-                'python3 script/link_prediction.py {file} {RESULT_FILE} {lambd} {dim} {REPETITION}')
+                'python3 script/train_test_set_split.py {network_file} {NUMBER_OF_TEST_SET}')
+
