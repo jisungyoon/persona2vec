@@ -3,19 +3,11 @@ import logging
 
 from multiprocessing import Process
 
+from common_function import run_parallel
 from persona2vec.network_train_test_splitter import networkTrainTestSplitter
 from persona2vec.utils import read_graph
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-
-
-def run_parallel(function, args, number_of_cores):
-    procs = [Process(target=function, args=[proc_num] + args)
-             for proc_num in range(number_of_cores)]
-    for p in procs:
-        p.start()
-    for p in procs:
-        p.join()
 
 
 def train_test_set_split(proc_num, IN_FILE):

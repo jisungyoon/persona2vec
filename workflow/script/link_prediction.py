@@ -4,20 +4,12 @@ import logging
 from multiprocessing import Process
 import pickle
 
+from common_function import run_parallel
 from persona2vec.model import Persona2Vec
 from persona2vec.link_prediction import linkPredictionTask
 from persona2vec.utils import read_graph
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-
-
-def run_parallel(function, args, number_of_cores):
-    procs = [Process(target=function, args=[proc_num] + args)
-             for proc_num in range(number_of_cores)]
-    for p in procs:
-        p.start()
-    for p in procs:
-        p.join()
 
 
 def do_link_prediction(proc_num, NETWORK_FILE, TEST_EDGE_FILE, NEGATIVE_EDGE_FILE, OUT_FILE, LAMBD, DIM):
