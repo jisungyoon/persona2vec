@@ -15,7 +15,7 @@ class linkPredictionTask(object):
     def __init__(self, G,
                  test_edges,
                  negative_edges,
-                 embs,
+                 emb,
                  name,
                  persona=False,
                  node_to_persona={}):
@@ -23,11 +23,13 @@ class linkPredictionTask(object):
         self.G = G
         self.test_edges = test_edges
         self.negative_edges = negative_edges   
-        self.embs = embs
+        self.emb = emb
         self.name = name
         
+        # for persona related embedding
         self.persona = persona
         self.node_to_persona = node_to_persona
+        self.aggregate_function = max
         
     def do_link_prediction(self):
         self.calculate_link_prediction_score()
@@ -35,23 +37,23 @@ class linkPredictionTask(object):
         self.print_result()
     
     def calculate_link_prediction_score(self):
-        caculate_method = self.calculate_score_persona if persona else self.calculate_score
+        calculate_method = self.calculate_score_persona if self.persona else self.calculate_score
         self.link_prediction_score_postive = np.array(
             calculate_method(self.test_edges))
         self.link_prediction_score_negative = np.array(
             calculate_method(self.negative_edges))
 
-    def calculate_score(self, edge_list):
+    def calculate_score_persona(self, edge_list):
         score_list = []
         for src, tag in edge_list:
-            src_personas = self.model.node_to_persona[src]
-            tag_personas = self.model.node_to_persona[tag]
-            max_sim = max([np.dot(self.emb[src_persona], self.emb[tag_persona])
+            src_personas = self.node_to_persona[src]
+            tag_personas = self.node_to_persona[tag]
+            max_sim = self.aggregate_function([np.dot(self.emb[src_persona], self.emb[tag_persona])
                            for src_persona in src_personas for tag_persona in tag_personas])
             score_list.append(max_sim)
         return score_list
     
-    def calculate_score_persona(self, edge_list):
+    def calculate_score(self, edge_list):
         score_list = [np.dot(self.emb[source], self.emb[target]) for source, target in edge_list]
         return score_list
 
