@@ -2,8 +2,6 @@ import sys
 import logging
 import pickle
 
-from common_function import run_parallel
-
 from persona2vec.model import Persona2Vec
 from persona2vec.link_prediction import linkPredictionTask
 from persona2vec.utils import read_graph
@@ -11,17 +9,16 @@ from persona2vec.utils import read_graph
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
-def do_link_prediction(proc_num,
-                       NETWORK_FILE,
+def do_link_prediction(NETWORK_FILE,
                        TEST_EDGE_FILE,
                        NEGATIVE_EDGE_FILE,
                        OUT_FILE,
                        LAMBDA,
-                       DIM):
-    logging.info('Core-' + str(proc_num) + ' start')
+                       DIM,
+                       NUMBER_OF_CORES):
     G = read_graph(NETWORK_FILE)
     model = Persona2Vec(
-        G, lambd=LAMBDA, dimensions=DIM, workers=4)
+        G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
     model.simulate_walks()
     emb = model.learn_embedding()
 
@@ -43,9 +40,10 @@ if __name__ == "__main__":
     OUT_FILE = sys.argv[4]
     LAMBDA = float(sys.argv[5])
     DIM = int(sys.argv[6])
-    REPETITION = int(sys.argv[7])
-
-    run_parallel(
-        do_link_prediction,
-        [NETWORK_FILE, TEST_EDGE_FILE, NEGATIVE_EDGE_FILE, OUT_FILE, LAMBDA, DIM],
-        REPETITION)
+    NUMBER_OF_CORES = int(sys.argv[7])
+    REPETITION = int(sys.argv[8])
+    
+    print(REPETITION)
+    
+    for i in range(REPETITION):
+        do_link_prediction(NETWORK_FILE, TEST_EDGE_FILE, NEGATIVE_EDGE_FILE, OUT_FILE, LAMBDA, DIM, NUMBER_OF_CORES)
