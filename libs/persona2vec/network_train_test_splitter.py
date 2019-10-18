@@ -12,13 +12,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
 class networkTrainTestSplitter(object):
-    def __init__(self, G):
+    def __init__(self, G,
+                 fraction=0.5):
         self.G = G
 
         self.original_edge_set = set(G.edges)
         self.node_list = list(G.nodes)
         self.total_number_of_edges = len(self.original_edge_set)
-        self.number_of_test_edges = int(self.total_number_of_edges / 2)
+        self.number_of_test_edges = int(self.total_number_of_edges * fraction)
 
         self.test_edges = []
         self.negative_edges = []
