@@ -1,10 +1,10 @@
 import sys
 import logging
-import pickle
+import csv
 
 from persona2vec.model import Persona2Vec
 from persona2vec.link_prediction import linkPredictionTask
-from persona2vec.utils import read_graph
+from persona2vec.utils import read_graph, read_edge_file
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -22,16 +22,15 @@ def do_link_prediction(NETWORK_FILE,
     model.simulate_walks()
     emb = model.learn_embedding()
 
-    test_edges = pickle.load(open(TEST_EDGE_FILE, 'rb'))
-    negative_edges = pickle.load(open(NEGATIVE_EDGE_FILE, 'rb'))
+    test_edges = read_edge_file(TEST_EDGE_FILE)
+    negative_edges = read_edge_file(NEGATIVE_EDGE_FILE)
 
     name = '\t'.join([NETWORK_FILE, str(LAMBDA), str(DIM)])
     test = linkPredictionTask(
-        G, test_edges, negative_edges, emb, name=name, persona=True,
+        G, test_edges, negative_edges, emb, name=name, is_persona_emb=True,
         node_to_persona=model.node_to_persona)
     test.do_link_prediction()
     test.write_result(OUT_FILE)
-
 
 if __name__ == "__main__":
     NETWORK_FILE = sys.argv[1]

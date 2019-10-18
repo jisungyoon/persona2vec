@@ -35,8 +35,8 @@ rule all:
 rule link_prediction:
     input:
         osjoin(DATA_DIR, "{name}_{index}", "network.elist"),
-        osjoin(DATA_DIR, "{name}_{index}", "test_edges.pkl"),
-        osjoin(DATA_DIR, "{name}_{index}", "negative_edges.pkl"),
+        osjoin(DATA_DIR, "{name}_{index}", "test_edges.tsv"),
+        osjoin(DATA_DIR, "{name}_{index}", "negative_edges.tsv"),
     output:
         osjoin(DATA_DIR, "{name}_{index}", "result.tsv"),
     run:
@@ -50,8 +50,8 @@ rule train_test_set_split:
         osjoin(DATA_DIR, "{name}.elist")
     output:
         osjoin(DATA_DIR, "{name}_{index}", "network.elist"),
-        osjoin(DATA_DIR, "{name}_{index}", "test_edges.pkl"),
-        osjoin(DATA_DIR, "{name}_{index}", "negative_edges.pkl")
+        osjoin(DATA_DIR, "{name}_{index}", "test_edges.tsv"),
+        osjoin(DATA_DIR, "{name}_{index}", "negative_edges.tsv")
 
     run:
         shell(
