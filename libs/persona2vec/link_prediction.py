@@ -72,5 +72,5 @@ class linkPredictionTask(object):
 
     def write_result(self, file_name):
         f = open(file_name, 'a')
-        f.write('\t'.join([self.name, str(self.ROC_AUC_value)]) + '\n')
+        f.write("{}\t{}\n".format(*[self.name, str(self.ROC_AUC_value)])
         f.close()
