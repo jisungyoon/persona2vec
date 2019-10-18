@@ -161,8 +161,13 @@ class Node2Vec(object):
         Learning an embedding of nodes in the base graph.
         :return self.embedding: Embedding of nodes in the latent space.
         """
-        self.model = Word2Vec(self.walks, size=self.dimensions, window=self.window_size,
-                              min_count=0, sg=1, workers=self.workers, iter=self.base_iter)
+        self.model = Word2Vec(self.walks,
+                              size=self.dimensions,
+                              window=self.window_size,
+                              min_count=0,
+                              sg=1,
+                              workers=self.workers,
+                              iter=self.base_iter)
         self.embedding = {
             node: self.model.wv[str(node)] for node in self.G.nodes()}
 
