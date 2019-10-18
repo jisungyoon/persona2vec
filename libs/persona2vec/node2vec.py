@@ -17,12 +17,13 @@ class Node2Vec(object):
     This code is from https://github.com/aditya-grover/node2vec.
     """
 
-    def __init__(self, G,
+    def __init__(self,
+                 G,
                  directed=False,
                  num_walks=10,
                  walk_length=80,
-                 p=1,
-                 q=1,
+                 p=1.0,
+                 q=1.0,
                  dimensions=128,
                  window_size=10,
                  base_iter=1,
