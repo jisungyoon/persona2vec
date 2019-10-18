@@ -34,7 +34,7 @@ class linkPredictionTask(object):
         self.print_result()
 
     def calculate_link_prediction_score(self):
-        calculate_method = self.calculate_score_persona if self.persona else self.calculate_score
+        calculate_method = self.calculate_score_persona if self.is_persona_emb else self.calculate_score
         self.link_prediction_score_postive = np.array(
             calculate_method(self.test_edges))
         self.link_prediction_score_negative = np.array(
@@ -72,5 +72,5 @@ class linkPredictionTask(object):
 
     def write_result(self, file_name):
         f = open(file_name, 'a')
-        f.write("{}\t{}\n".format(*[self.name, str(self.ROC_AUC_value)])
+        f.write("{}\t{}\n".format(*[self.name, str(self.ROC_AUC_value)]))
         f.close()

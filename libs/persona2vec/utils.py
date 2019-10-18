@@ -2,6 +2,7 @@ import os
 import errno
 import logging
 
+import csv
 import numpy as np
 import networkx as nx
 from texttable import Texttable
@@ -54,6 +55,13 @@ def read_graph(input_file_path, weighted=False, directed=False):
         G = G.to_undirected()
 
     return G
+
+
+def read_edge_file(FILE_PATH):
+    with open(FILE_PATH, 'rt') as f:
+        reader = csv.reader(f, delimiter='\t')
+        data = list(map(tuple, reader))
+    return data
 
 
 # Utility function for random walker

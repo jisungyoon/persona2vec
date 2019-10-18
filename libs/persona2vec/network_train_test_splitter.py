@@ -4,7 +4,7 @@ from tqdm import tqdm
 from os.path import join as osjoin
 
 from persona2vec.utils import mk_outdir
-import pickle
+import csv
 
 import logging
 
@@ -29,11 +29,10 @@ class networkTrainTestSplitter(object):
         while len(self.test_edges) != self.number_of_test_edges:
             edge_list = np.array(self.G.edges())
             candidate_idxs = np.random.choice(
-                len(edge_list), self.number_of_test_edges - count, replace=False)
+                len(edge_list), self.number_of_test_edges - len(self.test_edges), replace=False)
             for source, target in tqdm(edge_list[candidate_idxs]):
                 self.G.remove_edge(source, target)
                 if nx.is_connected(self.G):
-                    count += 1
                     self.test_edges.append((source, target))
                 else:
                     self.G.add_edge(source, target, weight=1)
@@ -45,14 +44,15 @@ class networkTrainTestSplitter(object):
             if (source, target) in self.original_edge_set:
                 pass
             else:
-                count += 1
                 self.negative_edges.append((source, target))
 
     def save_splitted_result(self, path):
         mk_outdir(path)
         nx.write_edgelist(self.G, osjoin(path, 'network.elist'))
-        with open(osjoin(path, 'test_edges.pkl'), 'wb') as f:
-            pickle.dump(self.test_edges, f)
-        with open(osjoin(path, 'negative_edges.pkl'), 'wb') as f:
-            pickle.dump(self.negative_edges, f)
+        with open(osjoin(path, 'test_edges.tsv'), 'wt') as f:
+            tsv_writer = csv.writer(f, delimiter='\t')
+            tsv_writer.writerows(self.test_edges)
+        with open(osjoin(path, 'negative_edges.tsv'), 'wt') as f:
+            tsv_writer = csv.writer(f, delimiter='\t')
+            tsv_writer.writerows(self.negative_edges)
         logging.info('Train-test splitter datas are stored')
