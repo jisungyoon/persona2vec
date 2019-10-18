@@ -13,7 +13,7 @@ class linkPredictionTask(object):
                  negative_edges,
                  emb,
                  name,
-                 persona=False,
+                 is_persona_emb=False,
                  node_to_persona={},
                  aggregate_function=max):
 
@@ -24,7 +24,7 @@ class linkPredictionTask(object):
         self.name = name
 
         # for persona related embedding
-        self.persona = persona
+        self.is_persona_emb = is_persona_emb
         self.node_to_persona = node_to_persona
         self.aggregate_function = aggregate_function
 
