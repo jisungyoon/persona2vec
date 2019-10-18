@@ -1,12 +1,11 @@
-import numpy as np
 import random
-from tqdm import tqdm
 import pickle
+import logging
+
+from tqdm import tqdm
 from gensim.models import Word2Vec
 
 from persona2vec.utils import alias_setup, alias_draw
-
-import logging
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
