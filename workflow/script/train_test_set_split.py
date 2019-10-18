@@ -1,8 +1,6 @@
 import sys
 import logging
 
-from multiprocessing import Process
-
 from common_function import run_parallel
 from persona2vec.network_train_test_splitter import networkTrainTestSplitter
 from persona2vec.utils import read_graph
@@ -23,8 +21,5 @@ def train_test_set_split(proc_num, IN_FILE):
 if __name__ == "__main__":
     IN_FILE = sys.argv[1]
     NUMBER_OF_TEST_SET = int(sys.argv[2])
-    
+
     run_parallel(train_test_set_split, [IN_FILE], NUMBER_OF_TEST_SET)
-    
-    
-    
