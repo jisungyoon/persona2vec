@@ -1,4 +1,3 @@
-import pandas as pd
 import networkx as nx
 from texttable import Texttable
 import numpy as np
@@ -21,7 +20,7 @@ def tab_printer(args):
                [[k.replace("_", " ").capitalize(), args[k]] for k in keys])
     print(t.draw())
 
-    
+
 def mk_outdir(out_path):
     if not os.path.exists(out_path):
         try:
@@ -30,7 +29,7 @@ def mk_outdir(out_path):
             if exc.errno != errno.EEXIST:
                 raise
     logging.info('output directory is created')
-    
+
 
 def read_graph(input_file_path, weighted=False, directed=False):
     '''
