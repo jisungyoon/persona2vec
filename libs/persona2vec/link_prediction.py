@@ -14,7 +14,8 @@ class linkPredictionTask(object):
                  emb,
                  name,
                  persona=False,
-                 node_to_persona={}):
+                 node_to_persona={},
+                 aggregate_function=max):
 
         self.G = G
         self.test_edges = test_edges
@@ -25,7 +26,7 @@ class linkPredictionTask(object):
         # for persona related embedding
         self.persona = persona
         self.node_to_persona = node_to_persona
-        self.aggregate_function = max
+        self.aggregate_function = aggregate_function
 
     def do_link_prediction(self):
         self.calculate_link_prediction_score()
