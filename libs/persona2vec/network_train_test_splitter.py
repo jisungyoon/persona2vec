@@ -24,9 +24,8 @@ class networkTrainTestSplitter(object):
         self.negative_edges = []
 
     def train_test_split(self):
-        count = 0
         logging.info('Initiate train test set split')
-        while count != self.number_of_test_edges:
+        while len(self.test_edges) != self.number_of_test_edges:
             edge_list = np.array(self.G.edges())
             candidate_idxs = np.random.choice(
                 len(edge_list), self.number_of_test_edges - count, replace=False)
@@ -39,9 +38,8 @@ class networkTrainTestSplitter(object):
                     self.G.add_edge(source, target, weight=1)
 
     def generate_negative_edges(self):
-        count = 0
         logging.info('Initiate generating negative edges')
-        while count != self.number_of_test_edges:
+        while len(self.negative_edges) != self.number_of_test_edges:
             src, tag = np.random.choice(self.node_list, 2)
             if (src, tag) in self.original_edge_set:
                 pass
