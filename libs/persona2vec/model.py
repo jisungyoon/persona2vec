@@ -18,12 +18,12 @@ class Persona2Vec(Node2Vec):
                  lambd=0.1,
                  directed=False,
                  num_walks=10,
-                 walk_length=80,
-                 p=1,
-                 q=1,
+                 walk_length=40,
+                 p=1.0,
+                 q=1.0,
                  dimensions=128,
-                 window_size=10,
-                 base_iter=1,
+                 window_size=5,
+                 base_iter=5,
                  workers=1):
         """
         :param G: NetworkX graph object. persona graah
@@ -49,7 +49,7 @@ class Persona2Vec(Node2Vec):
         self.node_to_persona = splitter.personalities
         self.persona_to_node = splitter.personality_map
         del splitter
-
+        
         super().__init__(self.persona_network,
                          directed=directed,
                          num_walks=num_walks,
