@@ -19,7 +19,7 @@ class networkTrainTestSplitter(object):
         self.node_list = list(G.nodes)
         self.total_number_of_edges = len(self.original_edge_set)
         self.number_of_test_edges = int(self.total_number_of_edges / 2)
-        
+
         self.test_edges = []
         self.negative_edges = []
 
@@ -48,7 +48,7 @@ class networkTrainTestSplitter(object):
             else:
                 count += 1
                 self.negative_edges.append((src, tag))
-    
+
     def save_splitted_result(self, path):
         mk_outdir(path)
         nx.write_edgelist(self.G, osjoin(path, 'network.elist'))

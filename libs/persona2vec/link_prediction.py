@@ -7,7 +7,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
 class linkPredictionTask(object):
-    def __init__(self, G,
+    def __init__(self,
+                 G,
                  test_edges,
                  negative_edges,
                  emb,
