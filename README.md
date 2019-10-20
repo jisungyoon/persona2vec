@@ -1,6 +1,18 @@
 # persona2vec
 A simple implementation of persona2vec
 
+# Installation
+You can use persona2vec as library. It is very simple.
+```
+python libs/setup.py install
+```
+For detail, please check a exmaple notebook, examples/example_karate.ipynb
+
+### Datasets - inputs
+The code takes the **edge list** of the graph in a csv file.
+You can easily make the edgelist file(*.elist) with networkx function [nx.write_edgelist](https://networkx.github.io/documentation/networkx1.10/reference/generated/networkx.readwrite.edgelist.write_edgelist.html) 
+or you can just use function read_graph in utils.
+
 ### Requirements
 The codebase is implemented in Python 3.5.2. package versions used for development are just below.
 ```
@@ -14,11 +26,6 @@ argparse          1.1.0
 gensim            3.6.0
 ```
 
-### Datasets - inputs
-The code takes the **edge list** of the graph in a csv file.
-You can easily make the edgelist file(*.elist) with networkx function [nx.write_edgelist](https://networkx.github.io/documentation/networkx1.10/reference/generated/networkx.readwrite.edgelist.write_edgelist.html) 
-or you can just use function read_graph in utils.
-
 ### Outputs
 There are 3 outputs on persona2vec
 
@@ -28,10 +35,21 @@ There are 3 outputs on persona2vec
   
 3. **Persona embedding**, Result embedding of Spitter on persona graph. This embedding is final results of this resposiotry. File format is pickle(.pkl).
 
-## Use as source code
+## Use as command line interface
 
-### Options
 The training of a persona2vec is handled by the `src/main.py` script which provides the following command line arguments.
+The following commands learn an embedding and save it with the persona map. Training a model on the default dataset.
+```
+persona2vec --input [INPUT_FILES_DIR] --persona-network [PERSONA_NETWORK_DIR] --persona-to-node [PERSONA_TO_NODE_DIR] -- node-to-persona [NODE_TO_PERSONA_DIR] --emb [RESULT_EMBE_DIR]
+```
+If you want to train a Persona2vec with 32 dimensions.
+```
+python src/main.py --dimensions 32
+```
+And, you can also change configurations for random walker easily with
+```
+python src/main.py --number-of-walks 20 --walk-length 80
+```
 
 #### Input and output options
    
@@ -57,7 +75,7 @@ The training of a persona2vec is handled by the `src/main.py` script which provi
   --window-size WINDOW_SIZE
                         Context size for optimization. Default is 10.
   --base_iter BASE_ITER
-                        Number of epochs in base embedding
+                        Number of epochs in embedding
   --p P                 Return hyperparameter for random-walker. Default is 1.
   --q Q                 Inout hyperparameter for random-walker. Default is 1.
   --workers WORKERS     Number of parallel workers. Default is 8.
@@ -67,26 +85,4 @@ The training of a persona2vec is handled by the `src/main.py` script which provi
   --directed            Graph is (un)directed. Default is undirected.
   --undirected
 ```
-
-### Examples
-The following commands learn an embedding and save it with the persona map. Training a model on the default dataset.
-```
-python src/main.py
-```
-
-Training a Splitter model with 32 dimensions.
-```
-python src/main.py --dimensions 32
-```
-Increasing the number of walks and the walk length.
-```
-python src/main.py --number-of-walks 20 --walk-length 80
-```
-
-## Use as library
-You can use persona2vec as library.
-```
-python libs/setup.py install
-```
-Check a exmaple notebook, example_karate.ipynb
 
