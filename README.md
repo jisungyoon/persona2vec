@@ -9,12 +9,11 @@ python libs/setup.py install
 For detail, please check a exmaple notebook, examples/example_karate.ipynb
 
 ### Datasets - inputs
-The code takes the **edge list** of the graph in a csv file.
+There is a utility function **read_graph** in ituls for reading input files.
 You can easily make the edgelist file(*.elist) with networkx function [nx.write_edgelist](https://networkx.github.io/documentation/networkx1.10/reference/generated/networkx.readwrite.edgelist.write_edgelist.html) 
-or you can just use function read_graph in utils.
 
 ### Requirements
-The codebase is implemented in Python 3.5.2. package versions used for development are just below.
+The codebase is implemented in Python 3.5.2. package versions used for development are just below. This library works well on various envirionet. If there is a problem, please let me know with issue. I will handle it.
 ```
 networkx          1.11
 tqdm              4.28.1
