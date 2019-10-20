@@ -30,7 +30,7 @@ There are 3 outputs on persona2vec
 
 1. **Persona network**, Persona network is a result network of ego-splitting. File format is edgelist(*.elist), which is same to format of inputs
   
-2. **persona to node, node to persona mapping**, Mappings is a dict that connnect orginal node and splitted persona nodes or vice versa. Bascially, relation between node and persona is 1 to M relations. File format is pickle(*.pkl)
+2. **persona to node, node to persona mapping**, Mappings is a dict that connnect orginal node and splitted persona nodes or vice versa. Bascially, relation between node and persona is 1 to M relations. File format is pickle(.pkl)
   
 3. **Persona embedding**, Result embedding of Spitter on persona graph. This embedding is final results of this resposiotry. File format is pickle(.pkl).
 
