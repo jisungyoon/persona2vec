@@ -44,11 +44,11 @@ persona2vec --input [INPUT_FILES_DIR] --persona-network [PERSONA_NETWORK_DIR] --
 ```
 If you want to train a Persona2vec with 32 dimensions.
 ```
-python src/main.py --dimensions 32
+persona2vec --dimensions 32
 ```
 And, you can also change configurations for random walker easily with
 ```
-python src/main.py --number-of-walks 20 --walk-length 80
+persona2vec --number-of-walks 20 --walk-length 80
 ```
 
 #### Input and output options
