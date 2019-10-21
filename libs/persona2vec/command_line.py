@@ -4,9 +4,9 @@ from persona2vec.utils import tab_printer, read_graph
 
 
 def parse_args():
-    ''''
+    """
     Parses the Splitter arguments.
-    '''
+    """
     parser = argparse.ArgumentParser(description="Run splitter with node2vec")
 
     # input and output files
