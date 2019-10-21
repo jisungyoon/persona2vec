@@ -42,7 +42,7 @@ rule link_prediction:
     run:
         for lambd, dim in product(*[LAMBDS, DIMS]):
             shell(
-                'python3 script/link_prediction.py {input} {RESULT_FILE} {lambd} {dim} {NUMBER_OF_WORKERS_FOR_TRAINING} {REPETITION_PER_SAMPLE}')
+                'python3 script/link_prediction.py {input} {output} {lambd} {dim} {NUMBER_OF_WORKERS_FOR_TRAINING} {REPETITION_PER_SAMPLE}')
 
 
 rule train_test_set_split:
