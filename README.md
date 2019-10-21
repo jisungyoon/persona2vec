@@ -1,13 +1,26 @@
 # persona2vec
 A simple implementation of persona2vec
 
-# Installation
+## Installation
 You can use persona2vec as library. It is very simple.
 ```
 python libs/setup.py install
 ```
 
-# Usage
+### Requirements
+The codebase is implemented in Python 3.5.2. package versions used for development are just below. This library works well on various envirionet. If there is a problem, please let me know with issue. I will handle it.
+```
+networkx          1.11
+tqdm              4.28.1
+numpy             1.15.4
+pandas            0.23.4
+texttable         1.5.0
+scipy             1.1.0
+argparse          1.1.0
+gensim            3.6.0
+```
+
+## Usage
 You can use persona2vec as library.
 ```
     G = read_graph(NETWORK_FILE_NAME)
@@ -22,18 +35,6 @@ For detail, please check a exmaple notebook, examples/example_karate.ipynb
 There is a utility function **read_graph** in ituls for reading input files.
 You can easily make the edgelist file(*.elist) with networkx function [nx.write_edgelist](https://networkx.github.io/documentation/networkx1.10/reference/generated/networkx.readwrite.edgelist.write_edgelist.html) 
 
-### Requirements
-The codebase is implemented in Python 3.5.2. package versions used for development are just below. This library works well on various envirionet. If there is a problem, please let me know with issue. I will handle it.
-```
-networkx          1.11
-tqdm              4.28.1
-numpy             1.15.4
-pandas            0.23.4
-texttable         1.5.0
-scipy             1.1.0
-argparse          1.1.0
-gensim            3.6.0
-```
 
 ### Outputs
 There are 3 outputs on persona2vec
