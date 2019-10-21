@@ -30,7 +30,6 @@ class Node2Vec(object):
                  workers=1):
         """
         :param G: NetworkX graph object. persona graah
-        :param personalities: personalities by nodes
         :param directed: Directed network(True) or undirected network(False)
         :param num_walks: Number of random walker per node
         :param walk_length: Length(number of nodes) of random walker
@@ -62,9 +61,9 @@ class Node2Vec(object):
         self.preprocess_transition_probs()
 
     def preprocess_transition_probs(self):
-        '''
-        Preprocessing of transition probabilities for guiding the random walks.
-        '''
+        """
+        Preprocess transition probabilities for guiding the random walks.
+        """
         G = self.G
 
         alias_nodes = {}
@@ -93,9 +92,9 @@ class Node2Vec(object):
         return
 
     def simulate_walks(self):
-        '''
+        """
         Repeatedly simulate random walks from each node.
-        '''
+        """
         G = self.G
         walks = []
         nodes = list(G.nodes())
@@ -108,9 +107,11 @@ class Node2Vec(object):
         self.walks = walks
 
     def get_alias_edge(self, src, dst):
-        '''
+        """
         Get the alias edge setup lists for a given edge.
-        '''
+        :param src: Id of source node
+        :param dst: Id of target node
+        """
         G = self.G
         p = self.p
         q = self.q
@@ -130,9 +131,12 @@ class Node2Vec(object):
         return alias_setup(normalized_probs)
 
     def node2vec_walk(self, walk_length, start_node):
-        '''
+        """
         Simulate a random walk starting from start node.
-        '''
+        :param walk_length: Length of random walker
+        :param start_node: Starting node of random walker
+        :return walk: Generated trajectory of random walker
+        """
         G = self.G
         alias_nodes = self.alias_nodes
         alias_edges = self.alias_edges
@@ -174,5 +178,8 @@ class Node2Vec(object):
         return self.embedding
 
     def save_embedding(self, file_name):
+        """
+        :param file_name: name of file_name
+        """
         with open(file_name, 'wb') as f:
             pickle.dump(self.embedding, f)
