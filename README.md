@@ -42,7 +42,7 @@ The following commands learn an embedding and save it with the persona map. Trai
 persona2vec --input [INPUT_FILES_DIR] 
             --persona-network [PERSONA_NETWORK_DIR] \
             --persona-to-node [PERSONA_TO_NODE_DIR] \
-            -- node-to-persona [NODE_TO_PERSONA_DIR] \
+            --node-to-persona [NODE_TO_PERSONA_DIR] \
             --emb [RESULT_EMBE_DIR]
 ```
 If you want to train a Persona2vec with 32 dimensions.
