@@ -6,6 +6,16 @@ You can use persona2vec as library. It is very simple.
 ```
 python libs/setup.py install
 ```
+
+# Usage
+You can use persona2vec as library.
+```
+    G = read_graph(NETWORK_FILE_NAME)
+    model = Persona2Vec(
+        G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
+    model.simulate_walks()
+    emb = model.learn_embedding()
+```
 For detail, please check a exmaple notebook, examples/example_karate.ipynb
 
 ### Datasets - inputs
