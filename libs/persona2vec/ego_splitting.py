@@ -18,6 +18,8 @@ class EgoNetSplitter(object):
     def __init__(self, network, directed=False, lambd=0.1):
         """
         :param network: Networkx object.
+        :param directed: Directed network(True) or undirected network(False)
+        :param lambd: weight of persona edges
         """
         self.network = network
         self.directed = directed
