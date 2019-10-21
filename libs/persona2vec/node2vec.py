@@ -29,7 +29,7 @@ class Node2Vec(object):
                  base_iter=1,
                  workers=1):
         """
-        :param G: NetworkX graph object. persona graah
+        :param G: NetworkX graph object.
         :param directed: Directed network(True) or undirected network(False)
         :param num_walks: Number of random walker per node
         :param walk_length: Length(number of nodes) of random walker
