@@ -20,7 +20,7 @@ argparse          1.1.0
 gensim            3.6.0
 ```
 
-## Usage
+## How to use
 You can use persona2vec as library.
 ```
     G = read_graph(NETWORK_FILE_NAME)
