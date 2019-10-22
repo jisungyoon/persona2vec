@@ -11,9 +11,18 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
-class networkTrainTestSplitter(object):
+class NetworkTrainTestSplitter(object):
+    """
+    Train and Test set splitter for network data.
+    This class is for link prediction tasks.
+    """
+
     def __init__(self, G,
                  fraction=0.5):
+        """
+        :param G: Networkx graph object. Origin Graph
+        :param fraction: Fraction of edges that will be removed (test_edge).
+        """
         self.G = G
 
         self.original_edge_set = set(G.edges)
@@ -25,6 +34,10 @@ class networkTrainTestSplitter(object):
         self.negative_edges = []
 
     def train_test_split(self):
+        """
+        Split train and test edges.
+        Train network should have a one weakly connected component.
+        """
         logging.info('Initiate train test set split')
         while len(self.test_edges) != self.number_of_test_edges:
             edge_list = np.array(self.G.edges())
@@ -38,6 +51,9 @@ class networkTrainTestSplitter(object):
                     self.G.add_edge(source, target, weight=1)
 
     def generate_negative_edges(self):
+        """
+        Generate a negative samples for link prediction task
+        """
         logging.info('Initiate generating negative edges')
         while len(self.negative_edges) != self.number_of_test_edges:
             source, target = np.random.choice(self.node_list, 2)
@@ -47,6 +63,9 @@ class networkTrainTestSplitter(object):
                 self.negative_edges.append((source, target))
 
     def save_splitted_result(self, path):
+        """
+        :param path: path for saving result files (train network, test_edges, negative edges)
+        """
         mk_outdir(path)
         nx.write_edgelist(self.G, osjoin(path, 'network.elist'))
         with open(osjoin(path, 'test_edges.tsv'), 'wt') as f:

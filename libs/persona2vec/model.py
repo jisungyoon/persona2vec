@@ -49,7 +49,8 @@ class Persona2Vec(Node2Vec):
         self.node_to_persona = splitter.personalities
         self.persona_to_node = splitter.personality_map
         del splitter
-        
+
+        # generating Node2vec instant
         super().__init__(self.persona_network,
                          directed=directed,
                          num_walks=num_walks,
@@ -61,13 +62,25 @@ class Persona2Vec(Node2Vec):
                          base_iter=base_iter,
                          workers=workers)
 
-    def save_persona_network(self, file_name):
-        nx.write_edgelist(self.persona_network, file_name)
+    def save_persona_network(self, file_path):
+        """
+        :param file_path: file_path for persona network
+        :return:
+        """
+        nx.write_edgelist(self.persona_network, file_path)
 
-    def save_persona_to_node_mapping(self, file_name):
-        with open(file_name, 'wb') as f:
+    def save_persona_to_node_mapping(self, file_path):
+        """
+        :param file_path: file_path for persona to node mapper
+        :return:
+        """
+        with open(file_path, 'wb') as f:
             pickle.dump(self.persona_to_node, f)
 
-    def save_node_to_persona_mapping(self, file_name):
-        with open(file_name, 'wb') as f:
+    def save_node_to_persona_mapping(self, file_path):
+        """
+        :param file_path: file_path for node to persona mapper
+        :return:
+        """
+        with open(file_path, 'wb') as f:
             pickle.dump(self.node_to_persona, f)

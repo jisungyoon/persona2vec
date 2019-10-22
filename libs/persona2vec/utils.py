@@ -25,6 +25,10 @@ def tab_printer(args):
 
 
 def mk_outdir(out_path):
+    """
+    Check and make a directory
+    :param out_path: path for directory
+    """
     if not os.path.exists(out_path):
         try:
             os.makedirs(out_path)
@@ -35,12 +39,13 @@ def mk_outdir(out_path):
 
 
 def read_graph(input_file_path, weighted=False, directed=False):
-    '''
-    Reads the input network in networkx.
+    """
+    Reads the input network and return a networkx Graph object.
     :param input_file_path: File path of input graph
     :param weighted: weighted network(True) or unweighted network(False)
     :param directed: directed network(True) or undirected network(False)
-    '''
+    :return G: output network
+    """
     if weighted:
         G = nx.read_edgelist(input_file_path, nodetype=str,
                              data=(('weight', float),),
@@ -57,20 +62,25 @@ def read_graph(input_file_path, weighted=False, directed=False):
     return G
 
 
-def read_edge_file(FILE_PATH):
-    with open(FILE_PATH, 'rt') as f:
+def read_edge_file(file_path):
+    """
+    Read a edge list for link prediction (test or negative edges)
+    :param file_path: Path of edge lists (.tsv format)
+    :return: edge list
+    """
+    with open(file_path, 'rt') as f:
         reader = csv.reader(f, delimiter='\t')
         data = list(map(tuple, reader))
     return data
 
 
-# Utility function for random walker
 def alias_setup(probs):
-    '''
+    """
+    Utility function for random walker
     Compute utility lists for non-uniform sampling from discrete distributions.
 
     https://lips.cs.princeton.edu/the-alias-method-efficient-sampling-with-many-discrete-outcomes/
-    '''
+    """
     K = len(probs)
     q = np.zeros(K)
     J = np.zeros(K, dtype=np.int)
@@ -99,9 +109,9 @@ def alias_setup(probs):
 
 
 def alias_draw(J, q):
-    '''
+    """
     Draw sample from a non-uniform discrete distribution using alias sampling.
-    '''
+    """
     K = len(J)
 
     kk = int(np.floor(np.random.rand() * K))
