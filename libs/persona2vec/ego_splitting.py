@@ -86,8 +86,6 @@ class EgoNetSplitter(object):
             G = nx.from_edgelist(self.social_edges)
         for edge in G.edges():
             G[edge[0]][edge[1]]['weight'] = 1
-        # to check how method works, it can be deleted afterwards.
-        self.social_network = G.copy()
 
         #  Add persona edges
         if self.directed:
