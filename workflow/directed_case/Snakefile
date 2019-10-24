@@ -8,24 +8,21 @@ DATA_DIR = osjoin(PROJ_HOME, 'graph')
 
 
 # Raw dataset
-NETWORK_LIST = ['ca-HepTh']
+NETWORK_LIST = ['wiki-vote', 'sos-epinions']
 INPUT_FILE_LIST = [osjoin(DATA_DIR, network_name + '.elist')
                    for network_name in NETWORK_LIST]
 
 # Splitted dataset
-NUMBER_OF_TEST_SET = 1
+NUMBER_OF_TEST_SET = 10
 SPLITTED_FILE_DIRS = [osjoin(DATA_DIR, network_name + '_' + str(index))
                       for index in range(NUMBER_OF_TEST_SET) for network_name in NETWORK_LIST]
 RESULT_FILES = [osjoin(directory, 'result.tsv')
                           for directory in SPLITTED_FILE_DIRS]
                           
-REPETITION_PER_SAMPLE = 1
+REPETITION_PER_SAMPLE = 5
 NUMBER_OF_WORKERS_FOR_TRAINING = 4
 LAMBDS = np.linspace(0.1, 1, 10)
-DIMS = [8, 16, 32, 64, 128]
-
-# Computation envirioment
-RESULT_FILE = osjoin(PROJ_HOME, 'result.tsv')
+DIMS = [8, 16, 32, 64, 128, 256]
 
 
 rule all:
