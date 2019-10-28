@@ -8,7 +8,8 @@ DATA_DIR = osjoin(PROJ_HOME, 'graph')
 
 
 # Raw dataset
-NETWORK_LIST = ['wiki-vote', 'sos-epinions']
+NETWORK_LIST = ['ca-HepTh', 'ca-AstroPh', 'ppi']
+DIRECTED = False #directed and undireced netwoek must be sperated.
 INPUT_FILE_LIST = [osjoin(DATA_DIR, network_name + '.elist')
                    for network_name in NETWORK_LIST]
 
@@ -23,7 +24,6 @@ REPETITION_PER_SAMPLE = 5
 NUMBER_OF_WORKERS_FOR_TRAINING = 4
 LAMBDS = np.linspace(0.1, 1, 10)
 DIMS = [8, 16, 32, 64, 128, 256]
-
 
 rule all:
     input:
