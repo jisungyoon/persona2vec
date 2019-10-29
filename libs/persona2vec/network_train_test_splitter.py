@@ -18,12 +18,14 @@ class NetworkTrainTestSplitter(object):
     """
 
     def __init__(self, G,
+                 directed=False,   
                  fraction=0.5):
         """
         :param G: Networkx graph object. Origin Graph
         :param fraction: Fraction of edges that will be removed (test_edge).
         """
         self.G = G
+        self.directed = directed
 
         self.original_edge_set = set(G.edges)
         self.node_list = list(G.nodes)
@@ -39,13 +41,14 @@ class NetworkTrainTestSplitter(object):
         Train network should have a one weakly connected component.
         """
         logging.info('Initiate train test set split')
+        check_connectivity_method = nx.is_weakly_connected if self.directed else nx.is_connected
         while len(self.test_edges) != self.number_of_test_edges:
             edge_list = np.array(self.G.edges())
             candidate_idxs = np.random.choice(
                 len(edge_list), self.number_of_test_edges - len(self.test_edges), replace=False)
             for source, target in tqdm(edge_list[candidate_idxs]):
                 self.G.remove_edge(source, target)
-                if nx.is_connected(self.G):
+                if check_connectivity_method(self.G):
                     self.test_edges.append((source, target))
                 else:
                     self.G.add_edge(source, target, weight=1)
