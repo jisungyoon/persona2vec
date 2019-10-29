@@ -12,13 +12,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 def do_link_prediction(NETWORK_FILE,
                        TEST_EDGE_FILE,
                        NEGATIVE_EDGE_FILE,
+                       DIRECTED,
                        OUT_FILE,
                        LAMBDA,
                        DIM,
                        NUMBER_OF_CORES):
-    G = read_graph(NETWORK_FILE)
+    G = read_graph(NETWORK_FILE, directed=DIRECTED)
     model = Persona2Vec(
-        G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
+        G, lambd=LAMBDA, directed=DIRECTED, dimensions=DIM, workers=NUMBER_OF_CORES)
     model.simulate_walks()
     emb = model.learn_embedding()
 
@@ -36,13 +37,12 @@ if __name__ == "__main__":
     NETWORK_FILE = sys.argv[1]
     TEST_EDGE_FILE = sys.argv[2]
     NEGATIVE_EDGE_FILE = sys.argv[3]
-    OUT_FILE = sys.argv[4]
-    LAMBDA = float(sys.argv[5])
-    DIM = int(sys.argv[6])
-    NUMBER_OF_CORES = int(sys.argv[7])
-    REPETITION = int(sys.argv[8])
-    
-    print(REPETITION)
+    DIRECTED = True if sys.argv[4] == 'True' else False
+    OUT_FILE = sys.argv[5]
+    LAMBDA = float(sys.argv[6])
+    DIM = int(sys.argv[7])
+    NUMBER_OF_CORES = int(sys.argv[8])
+    REPETITION = int(sys.argv[9])
     
     for i in range(REPETITION):
-        do_link_prediction(NETWORK_FILE, TEST_EDGE_FILE, NEGATIVE_EDGE_FILE, OUT_FILE, LAMBDA, DIM, NUMBER_OF_CORES)
+        do_link_prediction(NETWORK_FILE, TEST_EDGE_FILE, NEGATIVE_EDGE_FILE, DIRECTED, OUT_FILE, LAMBDA, DIM, NUMBER_OF_CORES)
