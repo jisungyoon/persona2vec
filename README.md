@@ -8,7 +8,7 @@ python libs/setup.py install
 ```
 
 ### Requirements
-The codebase is implemented in Python 3.5.2. package versions used for development are just below. This library works well on various envirionet. If there is a problem, please let me know with issue. I will handle it.
+The codebase is implemented in Python 3.5.2. package versions used for development are just below. This library works well on various environment. If there is a problem, please let me know with issue. I will handle it.
 ```
 networkx          1.11
 tqdm              4.28.1
@@ -29,10 +29,10 @@ You can use persona2vec as library.
     model.simulate_walks()
     emb = model.learn_embedding()
 ```
-For detail, please check a exmaple notebook, examples/example_karate.ipynb
+For detail, please check a example notebook, `examples/example_karate.ipynb`
 
 ### Datasets - inputs
-There is a utility function **read_graph** in ituls for reading input files.
+There is a utility function **read_graph** in `persona2vec/utils.py` for reading input files.
 You can easily make the edgelist file(*.elist) with networkx function [nx.write_edgelist](https://networkx.github.io/documentation/networkx1.10/reference/generated/networkx.readwrite.edgelist.write_edgelist.html) 
 
 
