@@ -10,9 +10,7 @@ class EgoNetSplitter(object):
     """
     A revised implementation of "Ego-Splitting Framework: from Non-Overlapping
     to Overlapping Clusters" for Persona2Vec.
-    Paper: https://www.eecs.yorku.ca/course_archive/2017-18/F/6412/reading/kdd17p145.pdf
-    Video: https://www.youtube.com/watch?v=xMGZo-F_jss
-    Slides: https://epasto.org/papers/kdd2017-Slides.pdf
+    For details, please check the "Persona2Vec" paper.
     """
 
     def __init__(self, network, directed=False, lambd=0.1):
@@ -77,28 +75,25 @@ class EgoNetSplitter(object):
         logging.info("Creating the persona network.")
 
         # Add social edges
-        self.social_edges = [(self.components[edge[0]][edge[1]],
+        self.real_edges = [(self.components[edge[0]][edge[1]],
                               self.components[edge[1]][edge[0]])
                              for edge in tqdm(self.network.edges())]
-        if self.directed:
-            G = nx.from_edgelist(self.social_edges, create_using=nx.DiGraph())
-        else:
-            G = nx.from_edgelist(self.social_edges)
+        if not self.directed:
+            self.real_edges += [(self.components[edge[1]][edge[0]],
+                              self.components[edge[0]][edge[1]])
+                             for edge in tqdm(self.network.edges()) if edge[0] != edge[1]]
+            
+        G = nx.from_edgelist(self.real_edges, create_using=nx.DiGraph())
         for edge in G.edges():
             G[edge[0]][edge[1]]['weight'] = 1
 
         #  Add persona edges
-        if self.directed:
-            self.persona_edges = [(x, y, self.lambd)
-                                  for node, personas
-                                  in self.personalities.items()
-                                  if len(personas) > 1
-                                  for x, y in permutations(personas, 2)]
-        else:
-            self.persona_edges = [(x, y, self.lambd)
-                                  for node, personas,
-                                  in self.personalities.items()
-                                  if len(personas) > 1
-                                  for x, y in combinations(personas, 2)]
+        degree_dict = dict(G.out_degree())
+        self.persona_edges = [(x, y, self.lambd * (degree_dict[x]))
+                                      for node, personas
+                                      in self.personalities.items()
+                                      if len(personas) > 1
+                                      for x, y in permutations(personas, 2)]
+        
         G.add_weighted_edges_from(self.persona_edges)
         self.persona_network = G
