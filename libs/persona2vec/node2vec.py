@@ -1,8 +1,10 @@
 import random
 import pickle
+import itertools
 import logging
 
 from tqdm import tqdm
+from collections import Counter
 from gensim.models import Word2Vec
 
 from persona2vec.utils import alias_setup, alias_draw
@@ -26,7 +28,7 @@ class Node2Vec(object):
                  q=1.0,
                  dimensions=128,
                  window_size=10,
-                 base_iter=1,
+                 epoch=1,
                  workers=1):
         """
         :param G: NetworkX graph object.
@@ -37,7 +39,7 @@ class Node2Vec(object):
         :param q: search to differentiate between “inward” and “outward” nodes in the walk
         :param dimensions: Dimension of embedding vectors
         :param window_size: Maximum distance between the current and predicted node in the network
-        :param base_iter: Number of iterations (epochs) over the walks
+        :param epoch: Number of epochs over the walks
         :param workers: Number of CPU cores that will be used in training
         """
         self.G = G
@@ -52,7 +54,7 @@ class Node2Vec(object):
         # parameters for learning embeddings
         self.dimensions = dimensions
         self.window_size = window_size
-        self.base_iter = base_iter
+        self.epoch = epoch
 
         # computing configuration and path
         self.workers = workers
@@ -171,15 +173,49 @@ class Node2Vec(object):
                               min_count=0,
                               sg=1,
                               workers=self.workers,
-                              iter=self.base_iter)
+                              iter=self.epoch)
         self.embedding = {
             node: self.model.wv[str(node)] for node in self.G.nodes()}
 
         return self.embedding
-
+    
+    def initialize_persona_vectors(self, base_emb, persona_to_node):
+        self.model = Word2Vec(size=self.dimensions,
+                              window=self.window_size,
+                              min_count=0,
+                              sg=1,
+                              workers=self.workers,
+                              iter=self.epoch)
+        
+        flattened_walks = list(itertools.chain(*self.walks))
+        walk_counter = Counter(flattened_walks)
+        self.model.build_vocab_from_freq(walk_counters, corpus_count=len(self.walks))
+        for index, word in enumerate(model.wv.index2word):
+            model.wv.vectors[index] = emb[persona_to_node[word]]
+            
+    def initialize_persona_vectors(self, base_emb, persona_to_node):
+        self.model = Word2Vec(size=self.dimensions,
+                              window=self.window_size,
+                              min_count=0,
+                              sg=1,
+                              workers=self.workers,
+                              iter=self.epoch)
+        
+        flattened_walks = list(itertools.chain(*self.walks))
+        walk_counter = Counter(flattened_walks)
+        self.model.build_vocab_from_freq(walk_counter, corpus_count=len(self.walks))
+        for index, word in enumerate(self.model.wv.index2word):
+            self.model.wv.vectors[index] = base_emb[persona_to_node[word]]
+            
+    def learn_embedding_one_epoch(self):
+        self.model.train(self.walks, total_examples=self.model.corpus_count, epochs=1)
+        self.embedding = {
+            node: self.model.wv[str(node)] for node in self.G.nodes()}
+        
+        return self.embedding
+                
     def save_embedding(self, file_name):
         """
         :param file_name: name of file_name
         """
-        with open(file_name, 'wb') as f:
-            pickle.dump(self.embedding, f)
+        self.model.wv.save_word2vec_format(file_name)
