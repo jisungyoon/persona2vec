@@ -8,7 +8,7 @@ python libs/setup.py install
 ```
 
 ### Requirements
-The codebase is implemented in Python 3.5.2. package versions used for development are just below. This library works well on various environment. If there is a problem, please let me know with issue. I will handle it.
+The codebase is implemented in Python 3.7.3, and package versions used for development are just below. This library works well on various environment. If there is a problem, please let me know with issue. I will handle it.
 ```
 networkx          1.11
 tqdm              4.28.1
@@ -26,8 +26,7 @@ You can use persona2vec as library.
     G = read_graph(NETWORK_FILE_NAME)
     model = Persona2Vec(
         G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
-    model.simulate_walks()
-    emb = model.learn_embedding()
+    emb = model.embedding
 ```
 For detail, please check a example notebook, `examples/example_karate.ipynb`
 
@@ -41,9 +40,9 @@ There are 3 outputs on persona2vec
 
 1. **Persona network**, Persona network is a result network of ego-splitting. File format is edgelist(*.elist), which is same to format of inputs
   
-2. **persona to node, node to persona mapping**, Mappings is a dict that connnect orginal node and splitted persona nodes or vice versa. Bascially, relation between node and persona is 1 to M relations. File format is pickle(.pkl)
+2. **persona to node, node to persona mapping**, Mappings is a dict that connnect orginal node and splitted persona nodes or vice versa. Bascially, relation between node and persona is 1 to M relations. File format is pickle(*.json)
   
-3. **Persona embedding**, Result embedding of Spitter on persona graph. This embedding is final results of this resposiotry. File format is pickle(.pkl).
+3. **Base embedding and Persona embedding**, Base embedding and persona embedding of Persona2vec. File format is pickle(.w2v), See [save_word2vec_format](https://radimrehurek.com/gensim/models/keyedvectors.html)
 
 ## Use as command line interface
 
@@ -54,7 +53,8 @@ persona2vec --input [INPUT_FILES_DIR]
             --persona-network [PERSONA_NETWORK_DIR] \
             --persona-to-node [PERSONA_TO_NODE_DIR] \
             --node-to-persona [NODE_TO_PERSONA_DIR] \
-            --emb [RESULT_EMBE_DIR]
+            --base-emb [BASE_EMB_DIR] \
+            --persona-emb [PERSONA_EMB_DIR]
 ```
 If you want to train a Persona2vec with 32 dimensions.
 ```
@@ -75,21 +75,32 @@ persona2vec --number-of-walks 20 --walk-length 80
                         Persona to node mapping file.
   --node-to-persona [NODE_TO_PERSONA]
                         Node to persona mapping file.
-  --emb [EMB]           Persona Embeddings path
+  --base-emb [BASE_EMB]
+                        Base Embeddings path
+  --persona-emb [PERSONA_EMB]
+                        Persona Embeddings path
 ```
 #### Model options
 ```
   --lambd LAMBD         Edge weight for persona edge, usually 0~1.
   --dimensions DIMENSIONS
                         Number of dimensions. Default is 128.
-  --walk-length WALK_LENGTH
-                        Length of walk per source. Default is 80.
-  --num-walks NUM_WALKS
+  --walk-length-base WALK_LENGTH_BASE
+                        Length of walk per source. Default is 40.
+  --num-walks-base NUM_WALKS_BASE
                         Number of walks per source. Default is 10.
-  --window-size WINDOW_SIZE
+  --window-size-base WINDOW_SIZE_BASE
+                        Context size for optimization. Default is 5.
+  --epoch-base EPOCH_BASE
+                        Number of epochs in the base embedding
+  --walk-length-persona WALK_LENGTH_PERSONA
+                        Length of walk per source. Default is 80.
+  --num-walks-persona NUM_WALKS_PERSONA
+                        Number of walks per source. Default is 10.
+  --window-size-persona WINDOW_SIZE_PERSONA
                         Context size for optimization. Default is 10.
-  --base_iter BASE_ITER
-                        Number of epochs in embedding
+  --epoch-persona EPOCH_PERSONA
+                        Number of epochs in persona embedding
   --p P                 Return hyperparameter for random-walker. Default is 1.
   --q Q                 Inout hyperparameter for random-walker. Default is 1.
   --workers WORKERS     Number of parallel workers. Default is 8.
