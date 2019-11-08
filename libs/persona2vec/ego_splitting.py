@@ -1,18 +1,15 @@
 import networkx as nx
 from tqdm import tqdm
-from itertools import combinations, permutations
+from itertools import permutations
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 
 class EgoNetSplitter(object):
     """
-    A revised implementation of "Ego-Splitting Framework: from Non-Overlapping
-    to Overlapping Clusters" for Persona2Vec.
-    Paper: https://www.eecs.yorku.ca/course_archive/2017-18/F/6412/reading/kdd17p145.pdf
-    Video: https://www.youtube.com/watch?v=xMGZo-F_jss
-    Slides: https://epasto.org/papers/kdd2017-Slides.pdf
+    A implementation of network ego splitting procedure.
+    For details, please check the "Persona2Vec" paper.
     """
 
     def __init__(self, network, directed=False, lambd=0.1):
@@ -25,7 +22,7 @@ class EgoNetSplitter(object):
         self.directed = directed
         self.lambd = lambd
         self.create_egonets()
-        self.map_personalities()
+        self.map_node_to_persona()
         self.create_persona_network()
 
     def create_egonet(self, node):
@@ -35,40 +32,49 @@ class EgoNetSplitter(object):
         """
         if self.directed:
             ego_net_minus_ego = self.network.subgraph(
-                nx.all_neighbors(self.network, node))
-            components = {i: nodes for i, nodes in enumerate(
-                nx.weakly_connected_components(ego_net_minus_ego))}
+                nx.all_neighbors(self.network, node)
+            )
+            components = {
+                i: nodes
+                for i, nodes in enumerate(
+                    nx.weakly_connected_components(ego_net_minus_ego)
+                )
+            }
         else:
-            ego_net_minus_ego = self.network.subgraph(
-                self.network.neighbors(node))
-            components = {i: nodes for i, nodes in enumerate(
-                nx.connected_components(ego_net_minus_ego))}
+            ego_net_minus_ego = self.network.subgraph(self.network.neighbors(node))
+            components = {
+                i: nodes
+                for i, nodes in enumerate(nx.connected_components(ego_net_minus_ego))
+            }
         new_mapping = {}
-        personalities = []
+        node_to_persona = []
         for i, (k, v) in enumerate(components.items()):
-            name = node + '-' + str(i + 1)
-            personalities.append(name)
+            name = "{}-{}".format(node, i + 1)
+            node_to_persona.append(name)
             for other_node in v:
                 new_mapping[other_node] = name
         self.components[node] = new_mapping
-        self.personalities[node] = personalities
+        self.node_to_persona[node] = node_to_persona
 
     def create_egonets(self):
         """
         Creating an egonet for each node.
         """
         self.components = {}
-        self.personalities = {}
+        self.node_to_persona = {}
         logging.info("Creating egonets.")
         for node in tqdm(self.network.nodes()):
             self.create_egonet(node)
 
-    def map_personalities(self):
+    def map_node_to_persona(self):
         """
         Mapping the personas to new nodes.
         """
-        self.personality_map = {persona: node for node in self.network.nodes(
-        ) for persona in self.personalities[node]}
+        self.persona_to_node = {
+            persona: node
+            for node in self.network.nodes()
+            for persona in self.node_to_persona[node]
+        }
 
     def create_persona_network(self):
         """
@@ -77,28 +83,30 @@ class EgoNetSplitter(object):
         logging.info("Creating the persona network.")
 
         # Add social edges
-        self.social_edges = [(self.components[edge[0]][edge[1]],
-                              self.components[edge[1]][edge[0]])
-                             for edge in tqdm(self.network.edges())]
-        if self.directed:
-            G = nx.from_edgelist(self.social_edges, create_using=nx.DiGraph())
-        else:
-            G = nx.from_edgelist(self.social_edges)
+        self.real_edges = [
+            (self.components[edge[0]][edge[1]], self.components[edge[1]][edge[0]])
+            for edge in tqdm(self.network.edges())
+            if edge[0] != edge[1]
+        ]
+        if not self.directed:
+            self.real_edges += [
+                (self.components[edge[1]][edge[0]], self.components[edge[0]][edge[1]])
+                for edge in tqdm(self.network.edges())
+                if edge[0] != edge[1]
+            ]
+
+        G = nx.from_edgelist(self.real_edges, create_using=nx.DiGraph())
         for edge in G.edges():
-            G[edge[0]][edge[1]]['weight'] = 1
+            G[edge[0]][edge[1]]["weight"] = 1
 
         #  Add persona edges
-        if self.directed:
-            self.persona_edges = [(x, y, self.lambd)
-                                  for node, personas
-                                  in self.personalities.items()
-                                  if len(personas) > 1
-                                  for x, y in permutations(personas, 2)]
-        else:
-            self.persona_edges = [(x, y, self.lambd)
-                                  for node, personas,
-                                  in self.personalities.items()
-                                  if len(personas) > 1
-                                  for x, y in combinations(personas, 2)]
+        degree_dict = dict(G.out_degree())
+        self.persona_edges = [
+            (x, y, self.lambd * (degree_dict[x]))
+            for node, personas in self.node_to_persona.items()
+            if len(personas) > 1
+            for x, y in permutations(personas, 2)
+        ]
+
         G.add_weighted_edges_from(self.persona_edges)
         self.persona_network = G
