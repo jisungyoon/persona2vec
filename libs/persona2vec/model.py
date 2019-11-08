@@ -36,13 +36,17 @@ class Persona2Vec(object):
         :param G: NetworkX graph object. persona graah
         :param lambd: edge weight for persona edge, usually 0 ~ 1
         :param directed: Directed network(True) or undirected network(False)
-        :param num_walks: Number of random walker per node
-        :param walk_length: Length(number of nodes) of random walker
+        :param num_walks_base: Number of random walker per node for the base embedding - the first round
+        :param walk_length_base: Length(number of nodes) of random walker for the base embedding - the first round
+        :param window_size_base: Maximum distance between the current and predicted node in the network for the base embedding - the first round
+        :param num_walks_persona: Number of random walker per node for the persona embedding - the second round
+        :param walk_length_persona: Length(number of nodes) of random walker for the persona embedding - the second round 
+        :param window_size_persona: Maximum distance between the current and predicted node in the network for the persona embedding - the second round
         :param p: the likelihood of immediately revisiting a node in the walk
         :param q: search to differentiate between “inward” and “outward” nodes in the walk
         :param dimensions: Dimension of embedding vectors
-        :param window_size: Maximum distance between the current and predicted node in the network
-        :param base_iter: Number of iterations (epochs) over the walks
+        :param epoch_base: Number of iterations (epochs) over the walks for the base embedding - the first round
+        :param epoch_persona: Number of iterations (epochs) over the walks for the persona embedding - the second round
         :param workers: Number of CPU cores that will be used in training
         """
         self.original_network = G
