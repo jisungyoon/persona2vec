@@ -48,7 +48,7 @@ class Persona2Vec(object):
         self.original_network = G
         self.lambd = lambd
 
-        # Get base embeddings on the origin network
+        # Get the base embeddings from the original network
         self.base_model = Node2Vec(
             self.original_network,
             directed=directed,
