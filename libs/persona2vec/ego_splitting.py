@@ -1,9 +1,9 @@
 import networkx as nx
 from tqdm import tqdm
-from itertools import combinations, permutations
+from itertools import permutations
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 
 class EgoNetSplitter(object):
@@ -32,18 +32,25 @@ class EgoNetSplitter(object):
         """
         if self.directed:
             ego_net_minus_ego = self.network.subgraph(
-                nx.all_neighbors(self.network, node))
-            components = {i: nodes for i, nodes in enumerate(
-                nx.weakly_connected_components(ego_net_minus_ego))}
+                nx.all_neighbors(self.network, node)
+            )
+            components = {
+                i: nodes 
+                for i, nodes in enumerate(
+                nx.weakly_connected_components(ego_net_minus_ego)
+                )
+            }
         else:
             ego_net_minus_ego = self.network.subgraph(
                 self.network.neighbors(node))
-            components = {i: nodes for i, nodes in enumerate(
-                nx.connected_components(ego_net_minus_ego))}
+            components = {
+                i: nodes 
+                for i, nodes in enumerate(nx.connected_components(ego_net_minus_ego))
+            }
         new_mapping = {}
         node_to_persona = []
         for i, (k, v) in enumerate(components.items()):
-            name = node + '-' + str(i + 1)
+            name = "{}-{}".format(node, i + 1)
             node_to_persona.append(name)
             for other_node in v:
                 new_mapping[other_node] = name
@@ -64,8 +71,11 @@ class EgoNetSplitter(object):
         """
         Mapping the personas to new nodes.
         """
-        self.persona_to_node = {persona: node for node in self.network.nodes(
-        ) for persona in self.node_to_persona[node]}
+        self.persona_to_node = {
+            persona: node 
+            for node in self.network.nodes()
+            for persona in self.node_to_persona[node]
+        }
 
     def create_persona_network(self):
         """
@@ -74,25 +84,32 @@ class EgoNetSplitter(object):
         logging.info("Creating the persona network.")
 
         # Add social edges
-        self.real_edges = [(self.components[edge[0]][edge[1]],
-                              self.components[edge[1]][edge[0]])
-                             for edge in tqdm(self.network.edges())]
+        self.real_edges = [
+            (self.components[edge[0]][edge[1]],
+             self.components[edge[1]][edge[0]])
+            for edge in tqdm(self.network.edges())
+            if edge[0] != edge[1]
+        ]
         if not self.directed:
-            self.real_edges += [(self.components[edge[1]][edge[0]],
-                              self.components[edge[0]][edge[1]])
-                             for edge in tqdm(self.network.edges()) if edge[0] != edge[1]]
+            self.real_edges += [
+                (self.components[edge[1]][edge[0]],
+                 self.components[edge[0]][edge[1]])
+                for edge in tqdm(self.network.edges())
+                if edge[0] != edge[1]
+            ]
             
         G = nx.from_edgelist(self.real_edges, create_using=nx.DiGraph())
         for edge in G.edges():
-            G[edge[0]][edge[1]]['weight'] = 1
+            G[edge[0]][edge[1]]["weight"] = 1
 
         #  Add persona edges
         degree_dict = dict(G.out_degree())
-        self.persona_edges = [(x, y, self.lambd * (degree_dict[x]))
-                                      for node, personas
-                                      in self.node_to_persona.items()
-                                      if len(personas) > 1
-                                      for x, y in permutations(personas, 2)]
+        self.persona_edges = [
+            (x, y, self.lambd * (degree_dict[x]))
+            for node, personas in self.node_to_persona.items()
+            if len(personas) > 1
+            for x, y in permutations(personas, 2)
+        ]
         
         G.add_weighted_edges_from(self.persona_edges)
         self.persona_network = G
