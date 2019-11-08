@@ -201,9 +201,9 @@ class Node2Vec(object):
 
         flattened_walks = list(itertools.chain(*self.walks))
         walk_counter = Counter(flattened_walks)
-        self.model.build_vocab_from_freq(walk_counters, corpus_count=len(self.walks))
-        for index, word in enumerate(model.wv.index2word):
-            model.wv.vectors[index] = emb[persona_to_node[word]]
+        self.model.build_vocab_from_freq(walk_counter, corpus_count=len(self.walks))
+        for index, word in enumerate(self.model.wv.index2word):
+            self.model.wv.vectors[index] = base_emb[persona_to_node[word]]
 
     def learn_embedding_one_epoch(self):
         """
