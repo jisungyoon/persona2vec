@@ -20,8 +20,7 @@ def do_link_prediction(NETWORK_FILE,
     G = read_graph(NETWORK_FILE, directed=DIRECTED)
     model = Persona2Vec(
         G, lambd=LAMBDA, directed=DIRECTED, dimensions=DIM, workers=NUMBER_OF_CORES)
-    model.simulate_walks()
-    emb = model.learn_embedding()
+    emb = model.embedding()
 
     test_edges = read_edge_file(TEST_EDGE_FILE)
     negative_edges = read_edge_file(NEGATIVE_EDGE_FILE)
