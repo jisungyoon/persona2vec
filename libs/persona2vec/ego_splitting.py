@@ -51,7 +51,7 @@ class EgoNetSplitter(object):
         new_mapping = {}
         personalities = []
         for i, (k, v) in enumerate(components.items()):
-            name = node + "-" + str(i + 1)
+            name = "{}-{}".format(node, i + 1)
             personalities.append(name)
             for other_node in v:
                 new_mapping[other_node] = name
