@@ -1,6 +1,6 @@
 import networkx as nx
 from tqdm import tqdm
-from itertools import combinations, permutations
+from itertools import permutations
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -76,13 +76,13 @@ class EgoNetSplitter(object):
 
         # Add social edges
         self.real_edges = [(self.components[edge[0]][edge[1]],
-                              self.components[edge[1]][edge[0]])
-                             for edge in tqdm(self.network.edges())]
+                            self.components[edge[1]][edge[0]])
+                           for edge in tqdm(self.network.edges())]
         if not self.directed:
             self.real_edges += [(self.components[edge[1]][edge[0]],
-                              self.components[edge[0]][edge[1]])
-                             for edge in tqdm(self.network.edges()) if edge[0] != edge[1]]
-            
+                                 self.components[edge[0]][edge[1]])
+                                for edge in tqdm(self.network.edges()) if edge[0] != edge[1]]
+
         G = nx.from_edgelist(self.real_edges, create_using=nx.DiGraph())
         for edge in G.edges():
             G[edge[0]][edge[1]]['weight'] = 1
@@ -90,10 +90,10 @@ class EgoNetSplitter(object):
         #  Add persona edges
         degree_dict = dict(G.out_degree())
         self.persona_edges = [(x, y, self.lambd * (degree_dict[x]))
-                                      for node, personas
-                                      in self.personalities.items()
-                                      if len(personas) > 1
-                                      for x, y in permutations(personas, 2)]
-        
+                              for node, personas
+                              in self.personalities.items()
+                              if len(personas) > 1
+                              for x, y in permutations(personas, 2)]
+
         G.add_weighted_edges_from(self.persona_edges)
         self.persona_network = G
