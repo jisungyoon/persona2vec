@@ -1,5 +1,4 @@
 import random
-import pickle
 import itertools
 import logging
 
@@ -10,7 +9,7 @@ from gensim.models import Word2Vec
 from persona2vec.utils import alias_setup, alias_draw
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 
 class Node2Vec(object):
@@ -19,17 +18,19 @@ class Node2Vec(object):
     This code is from https://github.com/aditya-grover/node2vec.
     """
 
-    def __init__(self,
-                 G,
-                 directed=False,
-                 num_walks=10,
-                 walk_length=80,
-                 p=1.0,
-                 q=1.0,
-                 dimensions=128,
-                 window_size=10,
-                 epoch=1,
-                 workers=1):
+    def __init__(
+        self,
+        G,
+        directed=False,
+        num_walks=10,
+        walk_length=80,
+        p=1.0,
+        q=1.0,
+        dimensions=128,
+        window_size=10,
+        epoch=1,
+        workers=1,
+    ):
         """
         :param G: NetworkX graph object.
         :param directed: Directed network(True) or undirected network(False)
@@ -70,11 +71,11 @@ class Node2Vec(object):
 
         alias_nodes = {}
         for node in G.nodes():
-            unnormalized_probs = [G[node][nbr]['weight']
-                                  for nbr in G.neighbors(node)]
+            unnormalized_probs = [G[node][nbr]["weight"] for nbr in G.neighbors(node)]
             norm_const = sum(unnormalized_probs)
             normalized_probs = [
-                float(u_prob) / norm_const for u_prob in unnormalized_probs]
+                float(u_prob) / norm_const for u_prob in unnormalized_probs
+            ]
             alias_nodes[node] = alias_setup(normalized_probs)
 
         alias_edges = {}
@@ -85,8 +86,7 @@ class Node2Vec(object):
         else:
             for edge in G.edges():
                 alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
-                alias_edges[(edge[1], edge[0])] = self.get_alias_edge(
-                    edge[1], edge[0])
+                alias_edges[(edge[1], edge[0])] = self.get_alias_edge(edge[1], edge[0])
 
         self.alias_nodes = alias_nodes
         self.alias_edges = alias_edges
@@ -100,12 +100,13 @@ class Node2Vec(object):
         G = self.G
         walks = []
         nodes = list(G.nodes())
-        logging.info('Gerating Walk iteration:')
+        logging.info("Gerating Walk iteration:")
         for walk_iter in tqdm(range(self.num_walks)):
             random.shuffle(nodes)
             for node in nodes:
-                walks.append(self.node2vec_walk(
-                    walk_length=self.walk_length, start_node=node))
+                walks.append(
+                    self.node2vec_walk(walk_length=self.walk_length, start_node=node)
+                )
         self.walks = walks
 
     def get_alias_edge(self, src, dst):
@@ -121,14 +122,13 @@ class Node2Vec(object):
         unnormalized_probs = []
         for dst_nbr in sorted(G.neighbors(dst)):
             if dst_nbr == src:
-                unnormalized_probs.append(G[dst][dst_nbr]['weight'] / p)
+                unnormalized_probs.append(G[dst][dst_nbr]["weight"] / p)
             elif G.has_edge(dst_nbr, src):
-                unnormalized_probs.append(G[dst][dst_nbr]['weight'])
+                unnormalized_probs.append(G[dst][dst_nbr]["weight"])
             else:
-                unnormalized_probs.append(G[dst][dst_nbr]['weight'] / q)
+                unnormalized_probs.append(G[dst][dst_nbr]["weight"] / q)
         norm_const = sum(unnormalized_probs)
-        normalized_probs = [
-            float(u_prob) / norm_const for u_prob in unnormalized_probs]
+        normalized_probs = [float(u_prob) / norm_const for u_prob in unnormalized_probs]
 
         return alias_setup(normalized_probs)
 
@@ -151,11 +151,15 @@ class Node2Vec(object):
             if len(cur_nbrs) > 0:
                 if len(walk) == 1:
                     walk.append(
-                        cur_nbrs[alias_draw(alias_nodes[cur][0], alias_nodes[cur][1])])
+                        cur_nbrs[alias_draw(alias_nodes[cur][0], alias_nodes[cur][1])]
+                    )
                 else:
                     prev = walk[-2]
-                    next = cur_nbrs[alias_draw(
-                        alias_edges[(prev, cur)][0], alias_edges[(prev, cur)][1])]
+                    next = cur_nbrs[
+                        alias_draw(
+                            alias_edges[(prev, cur)][0], alias_edges[(prev, cur)][1]
+                        )
+                    ]
                     walk.append(next)
             else:
                 break
@@ -167,47 +171,49 @@ class Node2Vec(object):
         Learning an embedding of nodes in the base graph.
         :return self.embedding: Embedding of nodes in the latent space.
         """
-        self.model = Word2Vec(self.walks,
-                              size=self.dimensions,
-                              window=self.window_size,
-                              min_count=0,
-                              sg=1,
-                              workers=self.workers,
-                              iter=self.epoch)
-        self.embedding = {
-            node: self.model.wv[str(node)] for node in self.G.nodes()}
+        self.model = Word2Vec(
+            self.walks,
+            size=self.dimensions,
+            window=self.window_size,
+            min_count=0,
+            sg=1,
+            workers=self.workers,
+            iter=self.epoch,
+        )
+        self.embedding = {node: self.model.wv[str(node)] for node in self.G.nodes()}
 
         return self.embedding
-    
+
     def initialize_persona_vectors(self, base_emb, persona_to_node):
         """
         Initialize perosnas' inital vectors with their base embedding
         :param base_emb: Base embedding from the original network
         :param persona_to_node: Matching dict which connects node and personas.
         """
-        self.model = Word2Vec(size=self.dimensions,
-                              window=self.window_size,
-                              min_count=0,
-                              sg=1,
-                              workers=self.workers,
-                              iter=self.epoch)
-        
+        self.model = Word2Vec(
+            size=self.dimensions,
+            window=self.window_size,
+            min_count=0,
+            sg=1,
+            workers=self.workers,
+            iter=self.epoch,
+        )
+
         flattened_walks = list(itertools.chain(*self.walks))
         walk_counter = Counter(flattened_walks)
         self.model.build_vocab_from_freq(walk_counters, corpus_count=len(self.walks))
         for index, word in enumerate(model.wv.index2word):
             model.wv.vectors[index] = emb[persona_to_node[word]]
-            
+
     def learn_embedding_one_epoch(self):
         """
         Train model for one epoch, and get embedding.
         """
         self.model.train(self.walks, total_examples=self.model.corpus_count, epochs=1)
-        self.embedding = {
-            node: self.model.wv[str(node)] for node in self.G.nodes()}
-        
+        self.embedding = {node: self.model.wv[str(node)] for node in self.G.nodes()}
+
         return self.embedding
-                
+
     def save_embedding(self, file_name):
         """
         :param file_name: name of file_name
