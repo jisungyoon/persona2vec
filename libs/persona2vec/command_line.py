@@ -37,11 +37,18 @@ def parse_args():
         default="examples/mapping/karate_node_to_persona.pkl",
         help="Node to persona mapping file.",
     )
-
+    
     parser.add_argument(
-        "--emb",
+        "--base-emb",
         nargs="?",
-        default="examples/emb/karate.pkl",
+        default="examples/emb/karate_base.pkl",
+        help="Base Embeddings path",
+    )
+    
+    parser.add_argument(
+        "--persona-emb",
+        nargs="?",
+        default="examples/emb/karate_persona.pkl",
         help="Persona Embeddings path",
     )
 
@@ -64,28 +71,53 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--walk-length",
+        "--walk-length-base",
         type=int,
-        default=80,
-        help="Length of walk per source. Default is 80.",
+        default=40,
+        help="Length of walk per source. Default is 40.",
     )
 
     parser.add_argument(
-        "--num-walks",
+        "--num-walks-base",
         type=int,
         default=10,
         help="Number of walks per source. Default is 10.",
     )
 
     parser.add_argument(
-        "--window-size",
+        "--window-size-base",
         type=int,
-        default=10,
+        default=5,
+        help="Context size for optimization. Default is 5.",
+    )
+
+    parser.add_argument(
+        "--epoch-base", type=int, default=1, help="Number of epochs in the base embedding"
+    )
+    
+    parser.add_argument(
+        "--walk-length-persona",
+        type=int,
+        default=80,
+        help="Length of walk per source. Default is 80.",
+    )
+
+    parser.add_argument(
+        "--num-walks-persona",
+        type=int,
+        default=5,
+        help="Number of walks per source. Default is 10.",
+    )
+
+    parser.add_argument(
+        "--window-size-persona",
+        type=int,
+        default=2,
         help="Context size for optimization. Default is 10.",
     )
 
     parser.add_argument(
-        "--base_iter", type=int, default=1, help="Number of epochs in base embedding"
+        "--epoch-persona", type=int, default=1, help="Number of epochs in persona embedding"
     )
 
     parser.add_argument(
@@ -141,27 +173,30 @@ def main():
     """
     args = parse_args()
     tab_printer(args)
-    graph = read_graph(args.input, args.weighted, args.directed)
+    G = read_graph(args.input, args.weighted, args.directed)
     model = Persona2Vec(
-        graph,
+        G,
         lambd=args.lambd,
         directed=args.directed,
-        num_walks=args.num_walks,
+        num_walks_base=args.num_walks_base,
+        walk_length_base=args.walk_length_base,
+        window_size_base=args.window_size_base,
+        num_walks_persona=args.num_walks_persona,
+        walk_length_persona=args.walk_length_persona,
+        window_size_persona=args.window_size_persona,
         p=args.p,
         q=args.q,
         dimensions=args.dimensions,
-        window_size=args.window_size,
-        base_iter=args.base_iter,
+        epoch_base=args.epoch_base,
+        epoch_persona=args.epoch_persona,
         workers=args.workers,
     )
-
-    model.simulate_walks()
-    model.learn_embedding()
-
+    
     model.save_persona_network(args.persona_network)
     model.save_persona_to_node_mapping(args.persona_to_node)
     model.save_node_to_persona_mapping(args.node_to_persona)
-    model.save_embedding(args.emb)
+    model.save_base_embedding(args.base_emb)
+    model.save_persona_embedding(args.persona_emb)
 
 
 if __name__ == "__main__":
