@@ -153,13 +153,10 @@ class Persona2Vec(object):
         :return:
         """
         self.base_model.save_embedding(file_path)
-        
+
     def save_persona_embedding(self, file_path):
         """
         :param file_path: file_path for node to persona mapper
         :return:
         """
         self.persona_model.save_embedding(file_path)
-        
-        
-    

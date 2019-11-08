@@ -37,14 +37,14 @@ def parse_args():
         default="examples/mapping/karate_node_to_persona.pkl",
         help="Node to persona mapping file.",
     )
-    
+
     parser.add_argument(
         "--base-emb",
         nargs="?",
         default="examples/emb/karate_base.pkl",
         help="Base Embeddings path",
     )
-    
+
     parser.add_argument(
         "--persona-emb",
         nargs="?",
@@ -92,9 +92,12 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--epoch-base", type=int, default=1, help="Number of epochs in the base embedding"
+        "--epoch-base",
+        type=int,
+        default=1,
+        help="Number of epochs in the base embedding",
     )
-    
+
     parser.add_argument(
         "--walk-length-persona",
         type=int,
@@ -117,7 +120,10 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--epoch-persona", type=int, default=1, help="Number of epochs in persona embedding"
+        "--epoch-persona",
+        type=int,
+        default=1,
+        help="Number of epochs in persona embedding",
     )
 
     parser.add_argument(
@@ -191,7 +197,7 @@ def main():
         epoch_persona=args.epoch_persona,
         workers=args.workers,
     )
-    
+
     model.save_persona_network(args.persona_network)
     model.save_persona_to_node_mapping(args.persona_to_node)
     model.save_node_to_persona_mapping(args.node_to_persona)
