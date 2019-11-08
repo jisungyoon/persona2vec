@@ -52,26 +52,26 @@ class Persona2Vec(object):
         self.original_network = G
         self.lambd = lambd
         self.directed = directed
-        
+
         self.num_walk_base = num_walk_base
         self.walk_length_base = walk_length_base
         self.window_size_base = window_size_base
         self.epoch_base = epoch_base
-        
+
         self.num_walk_persona = num_walk_persona
         self.walk_length_persona = walk_length_persona
         self.window_size_persona = window_size_persona
         self.epoch_persona = epoch_persona
-        
+
         self.p = p
         self.q = q
         self.dimensions = dimensions
         self.workers = workers
-        
+
         self.get_base_embedding()
         self.generate_persona_network()
         self.get_persona_embedding()
-        
+
     def get_base_embedding(self):
         """
         Get the base embeddings from the original network
@@ -90,8 +90,8 @@ class Persona2Vec(object):
         )
         self.base_model.simulate_walks()
         self.base_embedding = self.base_model.learn_embedding()
-        
-    def generate_persona_network(self)
+
+    def generate_persona_network(self):
         """
         Generate persona network with the given lambda
         """
@@ -101,8 +101,7 @@ class Persona2Vec(object):
         self.persona_network = splitter.persona_network
         self.node_to_persona = splitter.node_to_persona
         self.persona_to_node = splitter.persona_to_node
-    
-        
+
     def get_persona_embedding(self):
         """
         Get the persona embeddings from the persona network starts from base embeding
@@ -124,7 +123,6 @@ class Persona2Vec(object):
             self.base_embedding, self.persona_to_node
         )
         self.embedding = self.persona_model.learn_embedding_one_epoch()
-        
 
     def save_persona_network(self, file_path):
         """
