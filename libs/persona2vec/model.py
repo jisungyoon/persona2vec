@@ -69,7 +69,7 @@ class Persona2Vec(object):
             self.original_network, directed=directed, lambd=self.lambd
         )
         self.persona_network = splitter.persona_network
-        self.node_to_persona = splitter.personalities
+        self.node_to_persona = splitter.node_to_persona
         self.persona_to_node = splitter.personality_map
         del splitter
 

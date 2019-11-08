@@ -22,7 +22,7 @@ class EgoNetSplitter(object):
         self.directed = directed
         self.lambd = lambd
         self.create_egonets()
-        self.map_personalities()
+        self.map_node_to_persona()
         self.create_persona_network()
 
     def create_egonet(self, node):
@@ -41,31 +41,31 @@ class EgoNetSplitter(object):
             components = {i: nodes for i, nodes in enumerate(
                 nx.connected_components(ego_net_minus_ego))}
         new_mapping = {}
-        personalities = []
+        node_to_persona = []
         for i, (k, v) in enumerate(components.items()):
             name = node + '-' + str(i + 1)
-            personalities.append(name)
+            node_to_persona.append(name)
             for other_node in v:
                 new_mapping[other_node] = name
         self.components[node] = new_mapping
-        self.personalities[node] = personalities
+        self.node_to_persona[node] = node_to_persona
 
     def create_egonets(self):
         """
         Creating an egonet for each node.
         """
         self.components = {}
-        self.personalities = {}
+        self.node_to_persona = {}
         logging.info("Creating egonets.")
         for node in tqdm(self.network.nodes()):
             self.create_egonet(node)
 
-    def map_personalities(self):
+    def map_node_to_persona(self):
         """
         Mapping the personas to new nodes.
         """
-        self.personality_map = {persona: node for node in self.network.nodes(
-        ) for persona in self.personalities[node]}
+        self.persona_to_node = {persona: node for node in self.network.nodes(
+        ) for persona in self.node_to_persona[node]}
 
     def create_persona_network(self):
         """
@@ -90,7 +90,7 @@ class EgoNetSplitter(object):
         degree_dict = dict(G.out_degree())
         self.persona_edges = [(x, y, self.lambd * (degree_dict[x]))
                                       for node, personas
-                                      in self.personalities.items()
+                                      in self.node_to_persona.items()
                                       if len(personas) > 1
                                       for x, y in permutations(personas, 2)]
         
