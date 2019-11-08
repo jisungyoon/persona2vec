@@ -53,12 +53,12 @@ class Persona2Vec(object):
         self.lambd = lambd
         self.directed = directed
 
-        self.num_walk_base = num_walk_base
+        self.num_walks_base = num_walks_base
         self.walk_length_base = walk_length_base
         self.window_size_base = window_size_base
         self.epoch_base = epoch_base
 
-        self.num_walk_persona = num_walk_persona
+        self.num_walks_persona = num_walks_persona
         self.walk_length_persona = walk_length_persona
         self.window_size_persona = window_size_persona
         self.epoch_persona = epoch_persona
