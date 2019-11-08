@@ -35,16 +35,15 @@ class EgoNetSplitter(object):
                 nx.all_neighbors(self.network, node)
             )
             components = {
-                i: nodes 
+                i: nodes
                 for i, nodes in enumerate(
-                nx.weakly_connected_components(ego_net_minus_ego)
+                    nx.weakly_connected_components(ego_net_minus_ego)
                 )
             }
         else:
-            ego_net_minus_ego = self.network.subgraph(
-                self.network.neighbors(node))
+            ego_net_minus_ego = self.network.subgraph(self.network.neighbors(node))
             components = {
-                i: nodes 
+                i: nodes
                 for i, nodes in enumerate(nx.connected_components(ego_net_minus_ego))
             }
         new_mapping = {}
@@ -72,7 +71,7 @@ class EgoNetSplitter(object):
         Mapping the personas to new nodes.
         """
         self.persona_to_node = {
-            persona: node 
+            persona: node
             for node in self.network.nodes()
             for persona in self.node_to_persona[node]
         }
@@ -85,19 +84,17 @@ class EgoNetSplitter(object):
 
         # Add social edges
         self.real_edges = [
-            (self.components[edge[0]][edge[1]],
-             self.components[edge[1]][edge[0]])
+            (self.components[edge[0]][edge[1]], self.components[edge[1]][edge[0]])
             for edge in tqdm(self.network.edges())
             if edge[0] != edge[1]
         ]
         if not self.directed:
             self.real_edges += [
-                (self.components[edge[1]][edge[0]],
-                 self.components[edge[0]][edge[1]])
+                (self.components[edge[1]][edge[0]], self.components[edge[0]][edge[1]])
                 for edge in tqdm(self.network.edges())
                 if edge[0] != edge[1]
             ]
-            
+
         G = nx.from_edgelist(self.real_edges, create_using=nx.DiGraph())
         for edge in G.edges():
             G[edge[0]][edge[1]]["weight"] = 1
@@ -110,6 +107,6 @@ class EgoNetSplitter(object):
             if len(personas) > 1
             for x, y in permutations(personas, 2)
         ]
-        
+
         G.add_weighted_edges_from(self.persona_edges)
         self.persona_network = G
