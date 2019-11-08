@@ -2,6 +2,7 @@ import random
 import itertools
 import logging
 
+from multiprocessing import Pool
 from tqdm import tqdm
 from collections import Counter
 from gensim.models import Word2Vec
@@ -95,19 +96,26 @@ class Node2Vec(object):
 
     def simulate_walks(self):
         """
-        Repeatedly simulate random walks from each node.
+        Repeatedly simulate random walks from each node
         """
-        G = self.G
-        walks = []
-        nodes = list(G.nodes())
         logging.info("Gerating Walk iteration:")
-        for walk_iter in tqdm(range(self.num_walks)):
-            random.shuffle(nodes)
-            for node in nodes:
-                walks.append(
-                    self.node2vec_walk(walk_length=self.walk_length, start_node=node)
+        with Pool(self.workers) as p:
+            walks = list(
+                tqdm(
+                    p.imap(self.simulate_walk_one_iter, range(self.num_walks)),
+                    total=self.num_walks,
                 )
-        self.walks = walks
+            )
+
+    def simulate_walk_one_iter(self, _):
+        nodes = list(self.G.nodes())
+        random.shuffle(nodes)
+        walks = []
+        for node in nodes:
+            walks.append(
+                self.node2vec_walk(walk_length=self.walk_length, start_node=node)
+            )
+        return walks
 
     def get_alias_edge(self, src, dst):
         """
