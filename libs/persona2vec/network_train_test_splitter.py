@@ -8,7 +8,7 @@ import csv
 
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 
 class NetworkTrainTestSplitter(object):
@@ -17,9 +17,7 @@ class NetworkTrainTestSplitter(object):
     This class is for link prediction tasks.
     """
 
-    def __init__(self, G,
-                 directed=False,   
-                 fraction=0.5):
+    def __init__(self, G, directed=False, fraction=0.5):
         """
         :param G: Networkx graph object. Origin Graph
         :param fraction: Fraction of edges that will be removed (test_edge).
@@ -40,12 +38,17 @@ class NetworkTrainTestSplitter(object):
         Split train and test edges.
         Train network should have a one weakly connected component.
         """
-        logging.info('Initiate train test set split')
-        check_connectivity_method = nx.is_weakly_connected if self.directed else nx.is_connected
+        logging.info("Initiate train test set split")
+        check_connectivity_method = (
+            nx.is_weakly_connected if self.directed else nx.is_connected
+        )
         while len(self.test_edges) != self.number_of_test_edges:
             edge_list = np.array(self.G.edges())
             candidate_idxs = np.random.choice(
-                len(edge_list), self.number_of_test_edges - len(self.test_edges), replace=False)
+                len(edge_list),
+                self.number_of_test_edges - len(self.test_edges),
+                replace=False,
+            )
             for source, target in tqdm(edge_list[candidate_idxs]):
                 self.G.remove_edge(source, target)
                 if check_connectivity_method(self.G):
@@ -57,7 +60,7 @@ class NetworkTrainTestSplitter(object):
         """
         Generate a negative samples for link prediction task
         """
-        logging.info('Initiate generating negative edges')
+        logging.info("Initiate generating negative edges")
         while len(self.negative_edges) != self.number_of_test_edges:
             source, target = np.random.choice(self.node_list, 2)
             if (source, target) in self.original_edge_set:
@@ -70,11 +73,11 @@ class NetworkTrainTestSplitter(object):
         :param path: path for saving result files (train network, test_edges, negative edges)
         """
         mk_outdir(path)
-        nx.write_edgelist(self.G, osjoin(path, 'network.elist'))
-        with open(osjoin(path, 'test_edges.tsv'), 'wt') as f:
-            tsv_writer = csv.writer(f, delimiter='\t')
+        nx.write_edgelist(self.G, osjoin(path, "network.elist"))
+        with open(osjoin(path, "test_edges.tsv"), "wt") as f:
+            tsv_writer = csv.writer(f, delimiter="\t")
             tsv_writer.writerows(self.test_edges)
-        with open(osjoin(path, 'negative_edges.tsv'), 'wt') as f:
-            tsv_writer = csv.writer(f, delimiter='\t')
+        with open(osjoin(path, "negative_edges.tsv"), "wt") as f:
+            tsv_writer = csv.writer(f, delimiter="\t")
             tsv_writer.writerows(self.negative_edges)
-        logging.info('Train-test splitter datas are stored')
+        logging.info("Train-test splitter datas are stored")
