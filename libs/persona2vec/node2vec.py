@@ -100,7 +100,7 @@ class Node2Vec(object):
         """
         logging.info("Gerating Walk iteration:")
         with Pool(self.workers) as p:
-            walks = list(
+            self.walks = list(
                 tqdm(
                     p.imap(self.simulate_walk_one_iter, range(self.num_walks)),
                     total=self.num_walks,
