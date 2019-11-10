@@ -16,7 +16,6 @@ def train_test_set_split(IN_FILE, INDEX, DIRECTED):
     splitter.save_splitted_result(OUTPUT_PATH)
 
 
-name = "{}-{}".format(node, i + 1)
 if __name__ == "__main__":
     IN_FILE = sys.argv[1]
     INDEX = sys.argv[2]
