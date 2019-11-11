@@ -23,7 +23,7 @@ def do_link_prediction(
     model = Persona2Vec(
         G, lambd=LAMBDA, directed=DIRECTED, dimensions=DIM, workers=NUMBER_OF_CORES
     )
-    emb = model.embedding()
+    emb = model.embedding
 
     test_edges = read_edge_file(TEST_EDGE_FILE)
     negative_edges = read_edge_file(NEGATIVE_EDGE_FILE)
