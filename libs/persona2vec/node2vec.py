@@ -112,9 +112,8 @@ class Node2Vec(object):
         random.shuffle(nodes)
         walks = []
         for node in nodes:
-            walks.append(
-                self.node2vec_walk(walk_length=self.walk_length, start_node=node)
-            )
+            walks += self.node2vec_walk(walk_length=self.walk_length, start_node=node)
+         
         return walks
 
     def get_alias_edge(self, src, dst):
