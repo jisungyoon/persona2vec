@@ -57,11 +57,10 @@ class Node2Vec(object):
         self.dimensions = dimensions
         self.window_size = window_size
         self.epoch = epoch
-        
+
         # computing configuration and path
         self.workers = workers
         self.by_pass_mode = True if p == q == 1 else False
-        
 
         self.walks = []
         self.preprocess_transition_probs()
@@ -71,7 +70,7 @@ class Node2Vec(object):
         Preprocess transition probabilities for guiding the random walks.
         """
         G = self.G
-        
+
         logging.info("Calculating transition probability")
         alias_nodes = {}
         for node in tqdm(G.nodes()):
@@ -81,9 +80,9 @@ class Node2Vec(object):
                 float(u_prob) / norm_const for u_prob in unnormalized_probs
             ]
             alias_nodes[node] = alias_setup(normalized_probs)
-            
+
         self.alias_nodes = alias_nodes
-        
+
         alias_edges = {}
         if not self.by_pass_mode:
             logging.info("Calculating transition probability")
@@ -93,7 +92,9 @@ class Node2Vec(object):
             else:
                 for edge in tqdm(G.edges()):
                     alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
-                    alias_edges[(edge[1], edge[0])] = self.get_alias_edge(edge[1], edge[0])
+                    alias_edges[(edge[1], edge[0])] = self.get_alias_edge(
+                        edge[1], edge[0]
+                    )
 
         self.alias_edges = alias_edges
 
