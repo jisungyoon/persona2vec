@@ -5,6 +5,7 @@ import logging
 from multiprocessing import Pool
 from tqdm import tqdm
 from collections import Counter
+from itertools import chain
 from gensim.models import Word2Vec
 
 from persona2vec.utils import alias_setup, alias_draw
@@ -71,7 +72,7 @@ class Node2Vec(object):
         """
         G = self.G
 
-        logging.info("Calculating transition probability")
+        logging.info("Calculating transition probability:")
         alias_nodes = {}
         for node in tqdm(G.nodes()):
             unnormalized_probs = [G[node][nbr]["weight"] for nbr in G.neighbors(node)]
@@ -86,7 +87,7 @@ class Node2Vec(object):
         alias_edges = {}
         if not self.by_pass_mode:
             logging.info(
-                "Calculating transition probability for biassed behavior of random walker"
+                "Calculating transition probability for a biased behavior of random walker:"
             )
             if self.directed:
                 for edge in tqdm(G.edges()):
@@ -108,20 +109,19 @@ class Node2Vec(object):
         """
         logging.info("Gerating Walk iteration:")
         with Pool(self.workers) as p:
-            self.walks = list(
+            temp_walks = list(
                 tqdm(
                     p.imap(self.simulate_walk_one_iter, range(self.num_walks)),
                     total=self.num_walks,
                 )
             )
+        self.walks = list(chain(*temp_walks))
 
     def simulate_walk_one_iter(self, _):
         nodes = list(self.G.nodes())
         random.shuffle(nodes)
-        walks = []
-        for node in nodes:
-            walks += self.node2vec_walk(walk_length=self.walk_length, start_node=node)
-
+        walks = [self.node2vec_walk(walk_length=self.walk_length, start_node=node) for node in nodes]
+        
         return walks
 
     def get_alias_edge(self, src, dst):
