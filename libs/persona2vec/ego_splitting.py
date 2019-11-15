@@ -33,7 +33,7 @@ class EgoNetSplitter(object):
         if self.directed:
             ego_clustering_method = nx.weakly_connected_components
         else:
-            ego_clustring_method = nx.connected_components
+            ego_clustering_method = nx.connected_components
 
         neighbor_set = set(nx.all_neighbors(self.network, node)) - set([node])
         ego_net_minus_ego = self.network.subgraph(neighbor_set)
