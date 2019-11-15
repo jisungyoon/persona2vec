@@ -71,7 +71,7 @@ class Node2Vec(object):
         G = self.G
 
         alias_nodes = {}
-        for node in G.nodes():
+        for node in tqdm(G.nodes()):
             unnormalized_probs = [G[node][nbr]["weight"] for nbr in G.neighbors(node)]
             norm_const = sum(unnormalized_probs)
             normalized_probs = [
