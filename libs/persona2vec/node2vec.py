@@ -85,7 +85,9 @@ class Node2Vec(object):
 
         alias_edges = {}
         if not self.by_pass_mode:
-            logging.info("Calculating transition probability")
+            logging.info(
+                "Calculating transition probability for biassed behavior of random walker"
+            )
             if self.directed:
                 for edge in tqdm(G.edges()):
                     alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
