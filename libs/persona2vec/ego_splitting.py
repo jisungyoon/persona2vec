@@ -34,14 +34,13 @@ class EgoNetSplitter(object):
             ego_clustering_method = nx.weakly_connected_components
         else:
             ego_clustring_method = nx.connected_components
-        
+
         neighbor_set = set(nx.all_neighbors(self.network, node)) - set([node])
         ego_net_minus_ego = self.network.subgraph(neighbor_set)
         components = {
-            i: nodes
-            for i, nodes in enumerate(ego_clustering_method(ego_net_minus_ego))
+            i: nodes for i, nodes in enumerate(ego_clustering_method(ego_net_minus_ego))
         }
-        
+
         new_mapping = {}
         node_to_persona = []
         for i, (k, v) in enumerate(components.items()):
@@ -98,7 +97,8 @@ class EgoNetSplitter(object):
         #  Add persona edges
         degree_dict = dict(G.out_degree())
         self.persona_edges = [
-            (x, y, self.lambd * (degree_dict[x])) if degree_dict[x] > 0
+            (x, y, self.lambd * (degree_dict[x]))
+            if degree_dict[x] > 0
             else (x, y, self.lambd)
             for node, personas in self.node_to_persona.items()
             if len(personas) > 1
