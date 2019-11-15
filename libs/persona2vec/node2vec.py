@@ -120,8 +120,11 @@ class Node2Vec(object):
     def simulate_walk_one_iter(self, _):
         nodes = list(self.G.nodes())
         random.shuffle(nodes)
-        walks = [self.node2vec_walk(walk_length=self.walk_length, start_node=node) for node in nodes]
-        
+        walks = [
+            self.node2vec_walk(walk_length=self.walk_length, start_node=node)
+            for node in nodes
+        ]
+
         return walks
 
     def get_alias_edge(self, src, dst):
