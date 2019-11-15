@@ -96,7 +96,7 @@ class EgoNetSplitter(object):
 
         #  Add persona edges
         degree_dict = dict(G.out_degree())
-        degree_dict = { k : 1 if v == 0 else v for k,v in degree_dict}
+        degree_dict = {k: 1 if v == 0 else v for k, v in degree_dict}
         self.persona_edges = [
             (x, y, self.lambd * (degree_dict[x]))
             for node, personas in self.node_to_persona.items()
