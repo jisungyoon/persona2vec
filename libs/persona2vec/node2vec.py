@@ -182,7 +182,7 @@ class Node2Vec(object):
             else:
                 break
 
-        return walk
+        return list(map(str, walk))
 
     def learn_embedding(self):
         """
