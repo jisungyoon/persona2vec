@@ -112,9 +112,7 @@ class NetworkTrainTestSplitter(object):
         logging.info("Initiate generating negative edges")
         while len(self.negative_edges) != self.number_of_test_edges:
             source, target = np.random.choice(self.node_list, 2)
-            if (source, target) in self.original_edge_set:
-                pass
-            else:
+            if (source, target) not in self.original_edge_set and (target, source) not in self.original_edge_set:
                 self.negative_edges.append((source, target))
 
     def save_splitted_result(self, path):
