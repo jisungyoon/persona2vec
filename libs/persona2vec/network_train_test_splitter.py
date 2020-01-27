@@ -85,20 +85,20 @@ class NetworkTrainTestSplitter(object):
                 # instead of using the default check connectivity method
                 # here we use a lazy BFS method to stop early if target is reachable
                 reachable = False
-                seen={}                  # level (number of hops) when seen in BFS
-                level=0                  # the current level
-                nextlevel={source:1}  # dict of nodes to check at next level
+                seen = {}  # level (number of hops) when seen in BFS
+                level = 0  # the current level
+                nextlevel = {source: 1}  # dict of nodes to check at next level
                 while nextlevel:
-                    thislevel=nextlevel  # advance to next level
-                    nextlevel={}         # and start a new list (fringe)
+                    thislevel = nextlevel  # advance to next level
+                    nextlevel = {}  # and start a new list (fringe)
                     for v in thislevel:
                         if v not in seen:
-                            seen[v]=level # set the level of vertex v
-                            nextlevel.update(self.G[v]) # add neighbors of v
+                            seen[v] = level  # set the level of vertex v
+                            nextlevel.update(self.G[v])  # add neighbors of v
                     if target in seen:
                         reachable = True
                         break
-                    level=level+1
+                    level = level + 1
 
                 if reachable:
                     self.test_edges.append((source, target))
@@ -112,7 +112,10 @@ class NetworkTrainTestSplitter(object):
         logging.info("Initiate generating negative edges")
         while len(self.negative_edges) != self.number_of_test_edges:
             source, target = np.random.choice(self.node_list, 2)
-            if (source, target) not in self.original_edge_set and (target, source) not in self.original_edge_set:
+            if (source, target) not in self.original_edge_set and (
+                target,
+                source,
+            ) not in self.original_edge_set:
                 self.negative_edges.append((source, target))
 
     def save_splitted_result(self, path):

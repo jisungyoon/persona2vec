@@ -49,11 +49,7 @@ def read_graph(input_file_path, weighted=False, directed=False):
     :return G: output network
     """
     if weighted:
-        G = nx.read_edgelist(
-            input_file_path,
-            nodetype=str,
-            create_using=nx.DiGraph(),
-        )
+        G = nx.read_edgelist(input_file_path, nodetype=str, create_using=nx.DiGraph(),)
     else:
         G = nx.read_edgelist(input_file_path, nodetype=str, create_using=nx.DiGraph())
         for edge in G.edges():
