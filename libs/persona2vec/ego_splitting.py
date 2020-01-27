@@ -37,7 +37,7 @@ class EgoNetSplitter(object):
                 self.ego_clustering_method = nx.weakly_connected_components
             else:
                 self.ego_clustering_method = nx.connected_components
-        elif clustering_method == "modulairty":
+        elif clustering_method == "modularity":
             self.ego_clustering_method = modularity.greedy_modularity_communities
         elif clustering_method == "label_prop":
             self.ego_clustering_method = label_prop.label_propagation_communities
