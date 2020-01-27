@@ -14,7 +14,13 @@ class EgoNetSplitter(object):
     For details, please check the "Persona2Vec" paper.
     """
 
-    def __init__(self, network, directed=False, lambd=0.1, clustering_method='connected_component'):
+    def __init__(
+        self,
+        network,
+        directed=False,
+        lambd=0.1,
+        clustering_method="connected_component",
+    ):
         """
         :param network: Networkx object.
         :param directed: Directed network(True) or undirected network(False)
@@ -24,16 +30,16 @@ class EgoNetSplitter(object):
         self.network = network
         self.directed = directed
         self.lambd = lambd
-        
+
         # clustering algorithms
-        if clustering_method == 'connected_component':
+        if clustering_method == "connected_component":
             if self.directed:
                 self.ego_clustering_method = nx.weakly_connected_components
             else:
                 self.ego_clustering_method = nx.connected_components
-        elif clustering_method == 'modulairty':
+        elif clustering_method == "modulairty":
             self.ego_clustering_method = modularity.greedy_modularity_communities
-        elif clustering_method == 'label_prop':
+        elif clustering_method == "label_prop":
             self.ego_clustering_method = label_prop.label_propagation_communities
         else:
             logging.error("Not implemented for this clustering method")
@@ -55,15 +61,14 @@ class EgoNetSplitter(object):
         """
         neighbor_set = set(nx.all_neighbors(self.network, node)) - set([node])
         ego_net_minus_ego = self.network.subgraph(neighbor_set)
-        
+
         try:
             components = {
-                    i: nodes for i, nodes in enumerate(self.ego_clustering_method(ego_net_minus_ego))
+                i: nodes
+                for i, nodes in enumerate(self.ego_clustering_method(ego_net_minus_ego))
             }
         except ZeroDivisionError as error:
-            components = {
-                i: [node] for i, node in enumerate(ego_net_minus_ego.nodes)
-            }
+            components = {i: [node] for i, node in enumerate(ego_net_minus_ego.nodes)}
 
         new_mapping = {}
         node_to_persona = []

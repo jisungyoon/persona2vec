@@ -18,7 +18,7 @@ class Persona2Vec(object):
         self,
         G,
         lambd=0.1,
-        clustering_method='connected_component',
+        clustering_method="connected_component",
         directed=False,
         num_walks_base=10,
         walk_length_base=40,
@@ -99,7 +99,10 @@ class Persona2Vec(object):
         Generate persona network with the given lambda
         """
         splitter = EgoNetSplitter(
-            self.original_network, directed=self.directed, lambd=self.lambd, clustering_method=self.clustering_method
+            self.original_network,
+            directed=self.directed,
+            lambd=self.lambd,
+            clustering_method=self.clustering_method,
         )
         self.persona_network = splitter.persona_network
         self.node_to_persona = splitter.node_to_persona
