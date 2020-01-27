@@ -1,6 +1,8 @@
 import networkx as nx
 from tqdm import tqdm
 from itertools import permutations
+import networkx.algorithms.community.modularity_max as modularity
+import networkx.algorithms.community.label_propagation as label_prop
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -12,15 +14,30 @@ class EgoNetSplitter(object):
     For details, please check the "Persona2Vec" paper.
     """
 
-    def __init__(self, network, directed=False, lambd=0.1):
+    def __init__(self, network, directed=False, lambd=0.1, clustering_method='connected_component'):
         """
         :param network: Networkx object.
         :param directed: Directed network(True) or undirected network(False)
         :param lambd: weight of persona edges
+        :param clustering_method: name of the clustering method that uses in splitting personas.
         """
         self.network = network
         self.directed = directed
         self.lambd = lambd
+        
+        # clustering algorithms
+        if clustering_method == 'connected_component':
+            if self.directed:
+                self.ego_clustering_method = nx.weakly_connected_components
+            else:
+                self.ego_clustering_method = nx.connected_components
+        elif clustering_method == 'modulairty':
+            self.ego_clustering_method = modularity.greedy_modularity_communities
+        elif clustering_method == 'label_prop':
+            self.ego_clustering_method = label_prop.label_propagation_communities
+        else:
+            logging.error("Not implemented for this clustering method")
+            return
 
         # intialize unweighted edges with 1
         if not nx.is_weighted(self.network):
@@ -36,16 +53,17 @@ class EgoNetSplitter(object):
         Creating an ego net, extracting personas and partitioning it.
         :param node: Node ID for egonet (ego node).
         """
-        if self.directed:
-            ego_clustering_method = nx.weakly_connected_components
-        else:
-            ego_clustering_method = nx.connected_components
-
         neighbor_set = set(nx.all_neighbors(self.network, node)) - set([node])
         ego_net_minus_ego = self.network.subgraph(neighbor_set)
-        components = {
-            i: nodes for i, nodes in enumerate(ego_clustering_method(ego_net_minus_ego))
-        }
+        
+        try:
+            components = {
+                    i: nodes for i, nodes in enumerate(self.ego_clustering_method(ego_net_minus_ego))
+            }
+        except ZeroDivisionError as error:
+            components = {
+                i: [node] for i, node in enumerate(ego_net_minus_ego.nodes)
+            }
 
         new_mapping = {}
         node_to_persona = []
@@ -83,7 +101,7 @@ class EgoNetSplitter(object):
         """
         logging.info("Creating the persona network.")
 
-        # Add social edges
+        # Add original edges
         self.original_edges = [
             (
                 self.components[edge[0]][edge[1]],
