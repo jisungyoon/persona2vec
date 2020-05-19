@@ -1,10 +1,10 @@
-import sys
-import logging
 import csv
+import logging
+import sys
 
-from persona2vec.model import Persona2Vec
 from persona2vec.link_prediction import LinkPredictionTask
-from persona2vec.utils import read_graph, read_edge_file
+from persona2vec.model import Persona2Vec
+from persona2vec.utils import read_edge_file, read_graph
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 

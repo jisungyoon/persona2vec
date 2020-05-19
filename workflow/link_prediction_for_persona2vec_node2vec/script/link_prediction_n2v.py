@@ -1,11 +1,10 @@
-import sys
-import logging
 import csv
+import logging
+import sys
 
 from persona2vec import node2vec
 from persona2vec.link_prediction import LinkPredictionTask
-from persona2vec.utils import read_graph, read_edge_file
-
+from persona2vec.utils import read_edge_file, read_graph
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
@@ -31,11 +30,7 @@ def do_link_prediction(
 
     name = "\t".join([NETWORK_FILE, str(DIM)])
     test = LinkPredictionTask(
-        test_edges,
-        negative_edges,
-        emb,
-        name=name,
-        is_persona_emb=False
+        test_edges, negative_edges, emb, name=name, is_persona_emb=False
     )
     test.do_link_prediction()
     test.write_result(OUT_FILE)

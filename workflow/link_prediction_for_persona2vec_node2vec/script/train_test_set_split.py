@@ -1,5 +1,5 @@
-import sys
 import logging
+import sys
 
 from persona2vec.network_train_test_splitter import NetworkTrainTestSplitter
 from persona2vec.utils import read_graph

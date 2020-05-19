@@ -1,11 +1,11 @@
-import sys
-import logging
 import csv
+import logging
+import sys
 
-from persona2vec import node2vec
 import numpy as np
+from persona2vec import node2vec
+from persona2vec.utils import read_edge_file, read_graph
 from sklearn.linear_model import LogisticRegression
-from persona2vec.utils import read_graph, read_edge_file
 from sklearn.metrics import roc_auc_score
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -31,14 +31,18 @@ def do_link_prediction(
     negative_edges = read_edge_file(NEGATIVE_EDGE_FILE)
 
     test_hardmord_vectors = [np.multiply(emb[src], emb[tag]) for src, tag in test_edges]
-    negative_hardmord_vectors = [np.multiply(emb[src], emb[tag]) for src, tag in negative_edges]
+    negative_hardmord_vectors = [
+        np.multiply(emb[src], emb[tag]) for src, tag in negative_edges
+    ]
     xs = np.concatenate([test_hardmord_vectors, negative_hardmord_vectors])
-    ys = np.concatenate([np.ones(len(test_hardmord_vectors)), np.zeros(len(negative_hardmord_vectors))])
-    
+    ys = np.concatenate(
+        [np.ones(len(test_hardmord_vectors)), np.zeros(len(negative_hardmord_vectors))]
+    )
+
     clf = LogisticRegression(random_state=0).fit(xs, ys)
     predicted_ys = clf.predict(xs)
     ROC_AUC_value = roc_auc_score(ys, predicted_ys)
-    
+
     name = "\t".join([NETWORK_FILE, str(DIM)])
     f = open(OUT_FILE, "a")
     f.write("{}\t{}\n".format(*[name, str(ROC_AUC_value)]))
