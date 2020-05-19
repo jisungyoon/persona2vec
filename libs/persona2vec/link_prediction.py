@@ -1,7 +1,8 @@
+import logging
+
 import numpy as np
 from sklearn.metrics import roc_auc_score
-
-import logging
+from sklearn.metrics.pairwise import cosine_similarity
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
@@ -20,7 +21,8 @@ class LinkPredictionTask(object):
         name,
         is_persona_emb=False,
         node_to_persona={},
-        aggregate_function=max,
+        proximity_function="dot",
+        aggregate_function=np.amax,
     ):
         """
         :param test_edges: list of test edges
@@ -38,6 +40,10 @@ class LinkPredictionTask(object):
 
         self.link_prediction_score_positive = []
         self.link_prediction_score_negative = []
+
+        self.proximity_function = proximity_function
+        if self.proximity_function not in ["dot", "cos"]:
+            raise NotImplementedError
 
         # for persona based embedding
         self.is_persona_emb = is_persona_emb
@@ -75,17 +81,26 @@ class LinkPredictionTask(object):
         :return: score_list: score list of given edge_lists
         """
         score_list = []
-        for src, tag in edge_list:
-            src_personas = self.node_to_persona[src]
-            tag_personas = self.node_to_persona[tag]
-            max_sim = self.aggregate_function(
-                [
-                    np.dot(self.emb[src_persona], self.emb[tag_persona])
-                    for src_persona in src_personas
-                    for tag_persona in tag_personas
-                ]
-            )
-            score_list.append(max_sim)
+        if self.proximity_function == "dot":
+            for src, tag in edge_list:
+                src_personas = self.node_to_persona[src]
+                tag_personas = self.node_to_persona[tag]
+                max_sim = self.aggregate_function(
+                    [
+                        np.dot(self.emb[src_persona], self.emb[tag_persona])
+                        for src_persona in src_personas
+                        for tag_persona in tag_personas
+                    ]
+                )
+                score_list.append(max_sim)
+        elif self.proximity_function == "cos":
+            for src, tag in edge_list:
+                src_embs = [self.emb[persona] for persona in self.node_to_persona[src]]
+                tag_embs = [self.emb[persona] for persona in self.node_to_persona[tag]]
+                max_sim = np.amax(cosine_similarity(src_embs, tag_embs))
+                score_list.append(max_sim)
+        return score_list
+
         return score_list
 
     def calculate_score(self, edge_list):
@@ -94,9 +109,17 @@ class LinkPredictionTask(object):
         :param edge_list: list of target edges.
         :return: score_list: score list of given edge_lists
         """
-        score_list = [
-            np.dot(self.emb[source], self.emb[target]) for source, target in edge_list
-        ]
+        embs = np.array(
+            [[self.emb[source], self.emb[target]] for source, target in edge_list]
+        )
+
+        if self.proximity_function == "dot":
+            score_list = [
+                np.dot(source_emb, target_emb) for source_emb, target_emb in embs
+            ]
+        elif self.proximity_function == "cos":
+            score_list = cosine_similarity(embs[:, 0], embs[:, 1])
+
         return score_list
 
     def calculate_ROC_AUC_value(self):

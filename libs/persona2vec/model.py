@@ -1,10 +1,9 @@
 import json
-import networkx as nx
-
-from persona2vec.node2vec import Node2Vec
-from persona2vec.ego_splitting import EgoNetSplitter
-
 import logging
+
+import networkx as nx
+from persona2vec.ego_splitting import EgoNetSplitter
+from persona2vec.node2vec import Node2Vec
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 

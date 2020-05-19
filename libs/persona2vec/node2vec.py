@@ -1,15 +1,13 @@
-import random
 import itertools
 import logging
-
-from multiprocessing import Pool
-from tqdm import tqdm
+import random
 from collections import Counter
 from itertools import chain
+from multiprocessing import Pool
+
 from gensim.models import Word2Vec
-
-from persona2vec.utils import alias_setup, alias_draw
-
+from persona2vec.utils import alias_draw, alias_setup
+from tqdm import tqdm
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 

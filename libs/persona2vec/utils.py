@@ -1,12 +1,11 @@
-import os
+import csv
 import errno
 import logging
+import os
 
-import csv
-import numpy as np
 import networkx as nx
+import numpy as np
 from texttable import Texttable
-
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 

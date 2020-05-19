@@ -1,6 +1,7 @@
 import argparse
+
 from persona2vec.model import Persona2Vec
-from persona2vec.utils import tab_printer, read_graph
+from persona2vec.utils import read_graph, tab_printer
 
 
 def parse_args():
