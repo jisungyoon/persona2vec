@@ -22,11 +22,7 @@ RESULT_FILES = [osjoin(directory, 'result.tsv')
 REPETITION_PER_SAMPLE = 5
 NUMBER_OF_WORKERS_FOR_TRAINING = 4
 LAMBDS = np.linspace(0.1, 1, 10)
-DIMS = [8, 16, 32, 64, 128]
-
-# Computation envirioment
-RESULT_FILE = osjoin(PROJ_HOME, 'result.tsv')
-
+DIMS = [8, 16, 32, 64, 128, 256]
 
 rule all:
     input:
