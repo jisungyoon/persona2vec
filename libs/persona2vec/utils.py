@@ -8,7 +8,7 @@ import networkx as nx
 from texttable import Texttable
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 
 def tab_printer(args):
@@ -19,8 +19,10 @@ def tab_printer(args):
     args = vars(args)
     keys = sorted(args.keys())
     t = Texttable()
-    t.add_rows([["Parameter", "Value"]] +
-               [[k.replace("_", " ").capitalize(), args[k]] for k in keys])
+    t.add_rows(
+        [["Parameter", "Value"]]
+        + [[k.replace("_", " ").capitalize(), args[k]] for k in keys]
+    )
     print(t.draw())
 
 
@@ -35,7 +37,7 @@ def mk_outdir(out_path):
         except OSError as exc:
             if exc.errno != errno.EEXIST:
                 raise
-    logging.info('output directory is created')
+    logging.info("output directory is created")
 
 
 def read_graph(input_file_path, weighted=False, directed=False):
@@ -47,14 +49,11 @@ def read_graph(input_file_path, weighted=False, directed=False):
     :return G: output network
     """
     if weighted:
-        G = nx.read_edgelist(input_file_path, nodetype=str,
-                             data=(('weight', float),),
-                             create_using=nx.DiGraph())
+        G = nx.read_edgelist(input_file_path, nodetype=str, create_using=nx.DiGraph(),)
     else:
-        G = nx.read_edgelist(input_file_path, nodetype=str,
-                             create_using=nx.DiGraph())
+        G = nx.read_edgelist(input_file_path, nodetype=str, create_using=nx.DiGraph())
         for edge in G.edges():
-            G[edge[0]][edge[1]]['weight'] = 1
+            G[edge[0]][edge[1]]["weight"] = 1
 
     if not directed:
         G = G.to_undirected()
@@ -68,8 +67,8 @@ def read_edge_file(file_path):
     :param file_path: Path of edge lists (.tsv format)
     :return: edge list
     """
-    with open(file_path, 'rt') as f:
-        reader = csv.reader(f, delimiter='\t')
+    with open(file_path, "rt") as f:
+        reader = csv.reader(f, delimiter="\t")
         data = list(map(tuple, reader))
     return data
 
