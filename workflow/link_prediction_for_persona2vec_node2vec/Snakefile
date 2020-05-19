@@ -1,0 +1,107 @@
+from os.path import join as osjoin
+from itertools import product
+import numpy as np
+
+# Main paths
+PROJ_HOME = open('PROJ_HOME_DIR').read().strip()
+DATA_DIR = osjoin(PROJ_HOME, 'graph')
+
+
+# Raw dataset
+NETWORK_LIST = ['ca-HepTh', 'ca-AstroPh', 'ppi', 'soc-epinions', 'wiki-vote']
+DIRECTED = False #directed and undireced network
+NETWORK_FILE = osjoin(DATA_DIR, '{name}.elist')
+
+# Splitted network files
+SPLITTED_NETWORK_FILE = osjoin(DATA_DIR, "{name}_{index}", "network.elist")
+TEST_EDGE_FILE = osjoin(DATA_DIR, "{name}_{index}", "test_edges.tsv")
+NEG_EDGE_FILE = osjoin(DATA_DIR, "{name}_{index}", "negative_edges.tsv")
+
+
+
+# Result files
+                      
+P2V_RESULT_FILE = osjoin(DATA_DIR, "{name}_{index}", "p2v_result.tsv")
+P2V_RESULT_FILE_ALL =  osjoin(DATA_DIR, "p2v_result.tsv")
+
+N2V_RESULT_FILE = osjoin(DATA_DIR, "{name}_{index}", "n2v_result.tsv")
+N2V_RESULT_FILE_ALL =  osjoin(DATA_DIR, "n2v_result.tsv")
+
+N2V_LOGISTIC_RESULT_FILE = osjoin(DATA_DIR, "{name}_{index}", "n2v_logistic_result.tsv")
+N2V_LOGISTIC_RESULT_FILE_ALL =  osjoin(DATA_DIR, "n2v_logistic_result.tsv")
+
+
+    
+NUMBER_OF_TEST_SET = 10    
+REPETITION_PER_SAMPLE = 5
+NUMBER_OF_WORKERS_FOR_TRAINING = 4
+LAMBDS = np.linspace(0.1, 1, 10)
+DIMS = [8, 16, 32, 64, 128]
+
+rule all:
+    input:
+        P2V_RESULT_FILE_ALL,
+        N2V_RESULT_FILE_ALL,
+        N2V_LOGISTIC_RESULT_FILE_ALL
+
+rule link_prediction_n2v_logistic_all:
+    input:
+        expand(N2V_LOGISTIC_RESULT_FILE, name=NETWORK_LIST, index = range(NUMBER_OF_TEST_SET))
+    output:
+        N2V_LOGISTIC_RESULT_FILE_ALL
+
+rule link_prediction_n2v_logistic:
+    input:
+        SPLITTED_NETWORK_FILE,
+        TEST_EDGE_FILE,
+        NEG_EDGE_FILE
+    output:
+        N2V_LOGISTIC_RESULT_FILE
+    run:
+        shell('python3 script/link_prediction_n2v_logistic.py {input} {DIRECTED} {output} 128 {NUMBER_OF_WORKERS_FOR_TRAINING} {REPETITION_PER_SAMPLE}')
+        
+rule link_prediction_n2v_all:
+    input:
+        expand(N2V_RESULT_FILE, name=NETWORK_LIST, index = range(NUMBER_OF_TEST_SET))
+    output:
+        N2V_RESULT_FILE_ALL
+
+rule link_prediction_n2v:
+    input:
+        SPLITTED_NETWORK_FILE,
+        TEST_EDGE_FILE,
+        NEG_EDGE_FILE
+    output:
+        N2V_RESULT_FILE 
+    run:
+        shell('python3 script/link_prediction_n2v.py {input} {DIRECTED} {output} 128 {NUMBER_OF_WORKERS_FOR_TRAINING} {REPETITION_PER_SAMPLE}')
+        
+      
+rule link_prediction_p2v_all:
+    input:
+        expand(P2V_RESULT_FILE, name=NETWORK_LIST, index = range(NUMBER_OF_TEST_SET))
+    output:
+        P2V_RESULT_FILE_ALL
+
+rule link_prediction_p2v:
+    input:
+        SPLITTED_NETWORK_FILE,
+        TEST_EDGE_FILE,
+        NEG_EDGE_FILE
+    output:
+        P2V_RESULT_FILE 
+    run:
+        for lambd, dim in product(*[LAMBDS, DIMS]):
+            shell('python3 script/link_prediction_p2v.py {input} {DIRECTED} {output} {lambd} {dim} {NUMBER_OF_WORKERS_FOR_TRAINING} {REPETITION_PER_SAMPLE}')
+
+
+rule train_test_set_split:
+    input:
+        NETWORK_FILE
+    output:
+        SPLITTED_NETWORK_FILE,
+        TEST_EDGE_FILE,
+        NEG_EDGE_FILE
+
+    run:
+        shell('python3 script/train_test_set_split.py {input} {wildcards.index} {DIRECTED}')

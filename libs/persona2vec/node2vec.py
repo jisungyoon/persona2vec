@@ -5,6 +5,7 @@ import logging
 from multiprocessing import Pool
 from tqdm import tqdm
 from collections import Counter
+from itertools import chain
 from gensim.models import Word2Vec
 
 from persona2vec.utils import alias_setup, alias_draw
@@ -60,6 +61,7 @@ class Node2Vec(object):
 
         # computing configuration and path
         self.workers = workers
+        self.by_pass_mode = True if p == q == 1 else False
 
         self.walks = []
         self.preprocess_transition_probs()
@@ -70,8 +72,9 @@ class Node2Vec(object):
         """
         G = self.G
 
+        logging.info("Calculating transition probability:")
         alias_nodes = {}
-        for node in G.nodes():
+        for node in tqdm(G.nodes()):
             unnormalized_probs = [G[node][nbr]["weight"] for nbr in G.neighbors(node)]
             norm_const = sum(unnormalized_probs)
             normalized_probs = [
@@ -79,17 +82,23 @@ class Node2Vec(object):
             ]
             alias_nodes[node] = alias_setup(normalized_probs)
 
-        alias_edges = {}
-
-        if self.directed:
-            for edge in G.edges():
-                alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
-        else:
-            for edge in G.edges():
-                alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
-                alias_edges[(edge[1], edge[0])] = self.get_alias_edge(edge[1], edge[0])
-
         self.alias_nodes = alias_nodes
+
+        alias_edges = {}
+        if not self.by_pass_mode:
+            logging.info(
+                "Calculating transition probability for a biased behavior of random walker:"
+            )
+            if self.directed:
+                for edge in tqdm(G.edges()):
+                    alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
+            else:
+                for edge in tqdm(G.edges()):
+                    alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
+                    alias_edges[(edge[1], edge[0])] = self.get_alias_edge(
+                        edge[1], edge[0]
+                    )
+
         self.alias_edges = alias_edges
 
         return
@@ -100,20 +109,22 @@ class Node2Vec(object):
         """
         logging.info("Gerating Walk iteration:")
         with Pool(self.workers) as p:
-            self.walks = list(
+            temp_walks = list(
                 tqdm(
                     p.imap(self.simulate_walk_one_iter, range(self.num_walks)),
                     total=self.num_walks,
                 )
             )
+        self.walks = list(chain(*temp_walks))
 
     def simulate_walk_one_iter(self, _):
         nodes = list(self.G.nodes())
         random.shuffle(nodes)
-        walks = []
-        for node in nodes:
-            walks += self.node2vec_walk(walk_length=self.walk_length, start_node=node)
-         
+        walks = [
+            self.node2vec_walk(walk_length=self.walk_length, start_node=node)
+            for node in nodes
+        ]
+
         return walks
 
     def get_alias_edge(self, src, dst):
@@ -156,7 +167,7 @@ class Node2Vec(object):
             cur = walk[-1]
             cur_nbrs = sorted(G.neighbors(cur))
             if len(cur_nbrs) > 0:
-                if len(walk) == 1:
+                if len(walk) == 1 or self.by_pass_mode:
                     walk.append(
                         cur_nbrs[alias_draw(alias_nodes[cur][0], alias_nodes[cur][1])]
                     )
@@ -171,7 +182,7 @@ class Node2Vec(object):
             else:
                 break
 
-        return walk
+        return list(map(str, walk))
 
     def learn_embedding(self):
         """

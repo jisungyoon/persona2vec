@@ -1,6 +1,8 @@
 import networkx as nx
 from tqdm import tqdm
 from itertools import permutations
+import networkx.algorithms.community.modularity_max as modularity
+import networkx.algorithms.community.label_propagation as label_prop
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -12,15 +14,42 @@ class EgoNetSplitter(object):
     For details, please check the "Persona2Vec" paper.
     """
 
-    def __init__(self, network, directed=False, lambd=0.1):
+    def __init__(
+        self,
+        network,
+        directed=False,
+        lambd=0.1,
+        clustering_method="connected_component",
+    ):
         """
         :param network: Networkx object.
         :param directed: Directed network(True) or undirected network(False)
         :param lambd: weight of persona edges
+        :param clustering_method: name of the clustering method that uses in splitting personas.
         """
         self.network = network
         self.directed = directed
         self.lambd = lambd
+
+        # clustering algorithms
+        if clustering_method == "connected_component":
+            if self.directed:
+                self.ego_clustering_method = nx.weakly_connected_components
+            else:
+                self.ego_clustering_method = nx.connected_components
+        elif clustering_method == "modularity":
+            self.ego_clustering_method = modularity.greedy_modularity_communities
+        elif clustering_method == "label_prop":
+            self.ego_clustering_method = label_prop.label_propagation_communities
+        else:
+            logging.error("Not implemented for this clustering method")
+            return
+
+        # intialize unweighted edges with 1
+        if not nx.is_weighted(self.network):
+            for edge in self.network.edges():
+                self.network[edge[0]][edge[1]]["weight"] = 1
+
         self.create_egonets()
         self.map_node_to_persona()
         self.create_persona_network()
@@ -30,22 +59,17 @@ class EgoNetSplitter(object):
         Creating an ego net, extracting personas and partitioning it.
         :param node: Node ID for egonet (ego node).
         """
-        if self.directed:
-            ego_net_minus_ego = self.network.subgraph(
-                nx.all_neighbors(self.network, node)
-            )
+        neighbor_set = set(nx.all_neighbors(self.network, node)) - set([node])
+        ego_net_minus_ego = self.network.subgraph(neighbor_set)
+
+        try:
             components = {
                 i: nodes
-                for i, nodes in enumerate(
-                    nx.weakly_connected_components(ego_net_minus_ego)
-                )
+                for i, nodes in enumerate(self.ego_clustering_method(ego_net_minus_ego))
             }
-        else:
-            ego_net_minus_ego = self.network.subgraph(self.network.neighbors(node))
-            components = {
-                i: nodes
-                for i, nodes in enumerate(nx.connected_components(ego_net_minus_ego))
-            }
+        except ZeroDivisionError as error:
+            components = {i: [node] for i, node in enumerate(ego_net_minus_ego.nodes)}
+
         new_mapping = {}
         node_to_persona = []
         for i, (k, v) in enumerate(components.items()):
@@ -82,25 +106,33 @@ class EgoNetSplitter(object):
         """
         logging.info("Creating the persona network.")
 
-        # Add social edges
-        self.real_edges = [
-            (self.components[edge[0]][edge[1]], self.components[edge[1]][edge[0]])
-            for edge in tqdm(self.network.edges())
+        # Add original edges
+        self.original_edges = [
+            (
+                self.components[edge[0]][edge[1]],
+                self.components[edge[1]][edge[0]],
+                edge[2]["weight"],
+            )
+            for edge in tqdm(self.network.edges(data=True))
             if edge[0] != edge[1]
         ]
         if not self.directed:
-            self.real_edges += [
-                (self.components[edge[1]][edge[0]], self.components[edge[0]][edge[1]])
-                for edge in tqdm(self.network.edges())
+            self.original_edges += [
+                (
+                    self.components[edge[1]][edge[0]],
+                    self.components[edge[0]][edge[1]],
+                    edge[2]["weight"],
+                )
+                for edge in tqdm(self.network.edges(data=True))
                 if edge[0] != edge[1]
             ]
 
-        G = nx.from_edgelist(self.real_edges, create_using=nx.DiGraph())
-        for edge in G.edges():
-            G[edge[0]][edge[1]]["weight"] = 1
+        G = nx.DiGraph()
+        G.add_weighted_edges_from(self.original_edges)
 
         #  Add persona edges
         degree_dict = dict(G.out_degree())
+        degree_dict = {k: 1 if v == 0 else v for k, v in degree_dict.items()}
         self.persona_edges = [
             (x, y, self.lambd * (degree_dict[x]))
             for node, personas in self.node_to_persona.items()
