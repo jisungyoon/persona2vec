@@ -3,6 +3,8 @@ from tqdm import tqdm
 from itertools import permutations
 import networkx.algorithms.community.modularity_max as modularity
 import networkx.algorithms.community.label_propagation as label_prop
+from collections import defaultdict
+import community
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -41,6 +43,8 @@ class EgoNetSplitter(object):
             self.ego_clustering_method = modularity.greedy_modularity_communities
         elif clustering_method == "label_prop":
             self.ego_clustering_method = label_prop.label_propagation_communities
+        elif clustering_method == "modularity_louvain":
+            self.ego_clustering_method = louvain_algorithm
         else:
             logging.error("Not implemented for this clustering method")
             return
@@ -142,3 +146,11 @@ class EgoNetSplitter(object):
 
         G.add_weighted_edges_from(self.persona_edges)
         self.persona_network = G
+
+
+def louvain_algorithm(sub_graph):
+    partition = community.best_partition(sub_graph)
+    c_to_node = defaultdict(set)
+    for k,v in partition.items():
+        c_to_node[v].add(k)
+    return list(c_to_node.values())
