@@ -1,0 +1,91 @@
+from os.path import join as osjoin
+from itertools import product
+import numpy as np
+
+# This workflow is for testing splitter, it needs virtual envirioment for very old version of gensim.
+# So, we spereate this workflow from main workflow and use same splitted network for this task.
+# Set number of cores in the code.
+
+# Main paths
+PROJ_HOME = open('PROJ_HOME_DIR').read().strip()
+DATA_DIR = osjoin(PROJ_HOME, 'graph')
+
+# Raw dataset
+NETWORK_LIST = ['sos-epinions', 'wiki-vote', 'ca-HepTh', 'ca-AstroPh', 'ppi']
+DIRECTED = False #directed and undireced netwoek must be sperated.
+
+NUMBER_OF_TEST_SET = 10
+REPETITION_PER_SAMPLE = 5
+
+SPLITTED_NETWORK_FILE = osjoin(DATA_DIR, "{name}_{index}", "network.elist")
+TEST_EDGE_FILE = osjoin(DATA_DIR, "{name}_{index}", "test_edges.tsv")
+NEG_EDGE_FILE = osjoin(DATA_DIR, "{name}_{index}", "negative_edges.tsv")
+
+NEW_SPLITTED_NETWORK_FILE = osjoin(DATA_DIR, "{name}_{index}", "new_network.elist")
+NEW_TEST_EDGE_FILE = osjoin(DATA_DIR, "{name}_{index}", "new_test_edges.tsv")
+NEW_NEG_EDGE_FILE = osjoin(DATA_DIR, "{name}_{index}", "new_negative_edges.tsv")
+TRANSLATOR_FILE = osjoin(DATA_DIR, "{name}_{index}", "translator.pickle")
+
+RESULT_LOG_FILE = osjoin(DATA_DIR, "{name}_{index}", "{repetition}_log.txt")
+EMB_FILE = osjoin(DATA_DIR, "{name}_{index}", "{repetition}_emb.w2v"),
+MAPPER_FILE =  osjoin(DATA_DIR, "{name}_{index}", "{repetition}_mapper.txt"),
+
+PERFORMANCE_FILE = osjoin(DATA_DIR, "{name}_{index}","{repetition}_performance_result.tsv")
+
+OUTPUT_FILE = osjoin(DATA_DIR, 'splitter_result.tsv') 
+##OUTPUT_FILE  = osjoin(DATA_DIR, 'splitter_result_one_epoch.tsv') 
+
+
+
+
+                          
+rule all:
+    input:
+        OUTPUT_FILE
+        
+rule merge_tables:
+    input:
+        expand(PERFORMANCE_FILE, name=NETWORK_LIST, index=range(NUMBER_OF_TEST_SET), repetition=range(REPETITION_PER_SAMPLE))
+    output:
+        OUTPUT_FILE 
+    shell:
+        'python script/merge_tables.py {input} {output}'
+        
+rule calculate_link_prediction_score:
+    input:
+        EMB_FILE,
+        MAPPER_FILE, 
+        NEW_TEST_EDGE_FILE,
+        NEW_NEG_EDGE_FILE,
+    output:
+        PERFORMANCE_FILE
+        
+    run:
+        shell('python3 script/calculate_link_prediction.py {input} {output}')
+        
+rule run_splitter:
+    input:
+        NEW_SPLITTED_NETWORK_FILE,
+    output:
+        RESULT_LOG_FILE,
+        result_emb=EMB_FILE,
+        mapper=MAPPER_FILE 
+        
+    run:
+        shell("(time python3 -m persona.splitter --input_graph={input} --output_persona_embedding={output.result_emb} --output_persona_graph_mapping={output.mapper}) > '{output[0]}' 2>&1")
+
+
+
+rule conver_network_for_splitter:
+    input:
+        SPLITTED_NETWORK_FILE,
+        TEST_EDGE_FILE,
+        NEG_EDGE_FILE 
+    output:
+        NEW_SPLITTED_NETWORK_FILE,
+        NEW_TEST_EDGE_FILE,
+        NEW_NEG_EDGE_FILE,
+        TRANSLATOR_FILE,
+    run:
+        shell('python3 script/convert_files_for_splitter.py {input} {output} {DIRECTED}')
+
