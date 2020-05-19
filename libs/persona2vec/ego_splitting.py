@@ -1,11 +1,12 @@
-import networkx as nx
-from tqdm import tqdm
-from itertools import permutations
-import networkx.algorithms.community.modularity_max as modularity
-import networkx.algorithms.community.label_propagation as label_prop
-from collections import defaultdict
-import community
 import logging
+from collections import defaultdict
+from itertools import permutations
+
+import community
+import networkx as nx
+import networkx.algorithms.community.label_propagation as label_prop
+import networkx.algorithms.community.modularity_max as modularity
+from tqdm import tqdm
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
@@ -151,6 +152,6 @@ class EgoNetSplitter(object):
 def louvain_algorithm(sub_graph):
     partition = community.best_partition(sub_graph)
     c_to_node = defaultdict(set)
-    for k,v in partition.items():
+    for k, v in partition.items():
         c_to_node[v].add(k)
     return list(c_to_node.values())

@@ -1,12 +1,11 @@
-import networkx as nx
-import numpy as np
-from tqdm import tqdm
+import csv
+import logging
 from os.path import join as osjoin
 
+import networkx as nx
+import numpy as np
 from persona2vec.utils import mk_outdir
-import csv
-
-import logging
+from tqdm import tqdm
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 

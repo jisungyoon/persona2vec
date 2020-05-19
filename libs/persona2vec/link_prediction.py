@@ -100,7 +100,7 @@ class LinkPredictionTask(object):
                 max_sim = np.amax(cosine_similarity(src_embs, tag_embs))
                 score_list.append(max_sim)
         return score_list
-            
+
         return score_list
 
     def calculate_score(self, edge_list):
