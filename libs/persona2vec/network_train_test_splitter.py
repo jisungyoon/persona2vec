@@ -130,8 +130,8 @@ class NetworkTrainTestSplitter(object):
             tsv_writer = csv.writer(f, delimiter="\t")
             tsv_writer.writerows(self.negative_edges)
         logging.info("Train-test splitter datas are stored")
-        
-        
+
+
 # this splitter is way more faster than orignal one, but we used orignal splitter for our papers.
 class NetworkTrainTestSplitterWithMST(NetworkTrainTestSplitter):
     def __init__(self, G, directed=False, fraction=0.5):
@@ -160,4 +160,3 @@ class NetworkTrainTestSplitterWithMST(NetworkTrainTestSplitter):
         )
         self.test_edges = remained_edge_set[candidate_idxs]
         self.G.remove_edges_from(self.test_edges)
-

@@ -61,11 +61,11 @@ def parse_args():
         default=0.1,
         help="Edge weight for persona edge, usually 0~1.",
     )
-    
+
     parser.add_argument(
         "--clustering-method",
         type=str,
-        default="connected_component"",
+        default="connected_component",
         help="name of the clustering method that uses in splitting personas, choose one of these ('connected_component''modulairty','label_prop')",
     )
 
