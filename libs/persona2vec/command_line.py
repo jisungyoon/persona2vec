@@ -58,7 +58,7 @@ def parse_args():
     parser.add_argument(
         "--lambd",
         type=float,
-        default=0.1,
+        default=0.5,
         help="Edge weight for persona edge, usually 0~1.",
     )
 
