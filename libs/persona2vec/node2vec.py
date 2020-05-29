@@ -59,7 +59,7 @@ class Node2Vec(object):
 
         # computing configuration and path
         self.workers = workers
-        self.by_pass_mode = True if p == q == 1 else False
+        self.by_pass_mode = True if p == q == 1 else False # for the random-walker with p=q=1, which is an unbiased random walker
 
         self.walks = []
         self.preprocess_transition_probs()
