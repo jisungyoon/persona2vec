@@ -51,7 +51,7 @@ There are 3 outputs on persona2vec
 ## Use as command line interface
 
 persona2vec also support command line arguemnts.
-The following commands learn an embedding and save it with the persona map. Training a model on the default dataset.
+The following commands learn an embedding and save it with the **Persona network, persona to node mapping, node to persona mapping, base embeding, and persona embedding**.
 ```
 persona2vec --input [INPUT_FILES_DIR] 
             --persona-network [PERSONA_NETWORK_DIR] \
