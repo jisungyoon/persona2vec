@@ -50,7 +50,7 @@ There are 3 outputs on persona2vec
 
 ## Use as command line interface
 
-The training of a persona2vec is handled by the `src/main.py` script which provides the following command line arguments.
+persona2vec also support command line arguemnts.
 The following commands learn an embedding and save it with the persona map. Training a model on the default dataset.
 ```
 persona2vec --input [INPUT_FILES_DIR] 
