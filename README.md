@@ -24,10 +24,13 @@ python-louvain      -
 ## How to use
 You can use persona2vec as library.
 ```
-    G = read_graph(NETWORK_FILE_NAME)
-    model = Persona2Vec(
-        G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
-    emb = model.embedding
+from persona2vec.model import Persona2Vec
+from persona2vec.utils import read_graph
+
+G = read_graph(NETWORK_FILE_NAME)
+model = Persona2Vec(
+    G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
+emb = model.embedding
 ```
 For detail, please check a example notebook, `examples/example_karate.ipynb`
 
@@ -84,6 +87,10 @@ persona2vec --number-of-walks 20 --walk-length 80
 #### Model options
 ```
   --lambd LAMBD         Edge weight for persona edge, usually 0~1.
+  --clustering-method CLUSTERING_METHOD
+                        name of the clustering method that uses in splitting
+                        personas, choose one of these
+                        ('connected_component''modulairty','label_prop')
   --dimensions DIMENSIONS
                         Number of dimensions. Default is 128.
   --walk-length-base WALK_LENGTH_BASE
