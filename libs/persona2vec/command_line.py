@@ -6,9 +6,9 @@ from persona2vec.utils import read_graph, tab_printer
 
 def parse_args():
     """
-    Parses the Splitter arguments.
+    Parses the persona2vec arguments.
     """
-    parser = argparse.ArgumentParser(description="Run splitter with node2vec")
+    parser = argparse.ArgumentParser(description="Run persona2vec with node2vec")
 
     # input and output files
     parser.add_argument(
@@ -58,8 +58,15 @@ def parse_args():
     parser.add_argument(
         "--lambd",
         type=float,
-        default=0.1,
+        default=0.5,
         help="Edge weight for persona edge, usually 0~1.",
+    )
+
+    parser.add_argument(
+        "--clustering-method",
+        type=str,
+        default="connected_component",
+        help="name of the clustering method that uses in splitting personas, choose one of these ('connected_component''modulairty','label_prop')",
     )
 
     # hyper-parameter for learning embedding
@@ -184,6 +191,7 @@ def main():
     model = Persona2Vec(
         G,
         lambd=args.lambd,
+        clustering_method="connected_component",
         directed=args.directed,
         num_walks_base=args.num_walks_base,
         walk_length_base=args.walk_length_base,

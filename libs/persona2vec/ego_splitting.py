@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 class EgoNetSplitter(object):
     """
-    A implementation of network ego splitting procedure.
+    A implementation of network ego-splitting procedure.
     For details, please check the "Persona2Vec" paper.
     """
 

@@ -16,7 +16,7 @@ class Persona2Vec(object):
     def __init__(
         self,
         G,
-        lambd=0.1,
+        lambd=0.5,
         clustering_method="connected_component",
         directed=False,
         num_walks_base=10,

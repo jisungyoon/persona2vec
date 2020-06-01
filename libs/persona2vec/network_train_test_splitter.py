@@ -130,3 +130,33 @@ class NetworkTrainTestSplitter(object):
             tsv_writer = csv.writer(f, delimiter="\t")
             tsv_writer.writerows(self.negative_edges)
         logging.info("Train-test splitter datas are stored")
+
+
+# this splitter is way more faster than orignal one, but we used orignal splitter for our papers.
+class NetworkTrainTestSplitterWithMST(NetworkTrainTestSplitter):
+    def __init__(self, G, directed=False, fraction=0.5):
+        """
+        Only support undirected Network
+        :param G: Networkx graph object. Origin Graph
+        :param fraction: Fraction of edges that will be removed (test_edge).
+        """
+        if nx.is_directed(G):
+            raise NotImplementedError
+        super(NetworkTrainTestSplitterWithMST, self).__init__(
+            G, directed=directed, fraction=fraction
+        )
+
+    def train_test_split(self):
+        """
+        Split train and test edges with MST.
+        Train network should have a one weakly connected component.
+        """
+        logging.info("Initiate train test set split with MST")
+
+        MST = nx.minimum_spanning_tree(self.G)
+        remained_edge_set = np.array(list(set(self.G.edges()) - set(MST.edges)))
+        candidate_idxs = np.random.choice(
+            range(len(remained_edge_set)), self.number_of_test_edges, replace=False
+        )
+        self.test_edges = remained_edge_set[candidate_idxs]
+        self.G.remove_edges_from(self.test_edges)
