@@ -1,6 +1,12 @@
 # persona2vec
 A simple implementation of persona2vec
 
+## For Reproducibility
+
+We use [snakemake](https://snakemake.readthedocs.io/en/stable/) for reproducibility in the paper. Codes for experiment is under the workflow folder. <br>
+
+We have two workflows, a workflow for link prediction for persona2vec (node2vec) and a workflow for SPLITTER (baseline). You can easily run the worflow using command snakemake for each folder.
+
 ## Installation
 You can use persona2vec as library. It is very simple.
 ```
@@ -118,4 +124,3 @@ persona2vec --number-of-walks 20 --walk-length 80
   --directed            Graph is (un)directed. Default is undirected.
   --undirected
 ```
-
