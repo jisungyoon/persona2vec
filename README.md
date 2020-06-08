@@ -55,7 +55,7 @@ We use [snakemake](https://snakemake.readthedocs.io/en/stable/) for reproducibil
 
 We have two workflows, a workflow for link prediction for persona2vec (node2vec) and a workflow for SPLITTER (baseline). You can easily run the worflow using command snakemake for each folder.
 
-## Use as command line interface
+## Using as command line interface
 
 persona2vec also support command line arguemnts.
 The following commands learn an embedding and save it with the **Persona network, persona to node mapping, node to persona mapping, base embeding, and persona embedding**.
