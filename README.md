@@ -1,12 +1,6 @@
 # persona2vec
 A simple implementation of persona2vec
 
-## For Reproducibility
-
-We use [snakemake](https://snakemake.readthedocs.io/en/stable/) for reproducibility in the paper. Codes for experiment is under the workflow folder. <br>
-
-We have two workflows, a workflow for link prediction for persona2vec (node2vec) and a workflow for SPLITTER (baseline). You can easily run the worflow using command snakemake for each folder.
-
 ## Installation
 You can use persona2vec as library. It is very simple.
 ```
@@ -53,6 +47,13 @@ There are 3 outputs on persona2vec
 2. **persona to node, node to persona mapping**, Mappings is a dict that connnect orginal node and splitted persona nodes or vice versa. Bascially, relation between node and persona is 1 to M relations. File format is pickle(*.json)
   
 3. **Base embedding and Persona embedding**, Base embedding and persona embedding of Persona2vec. File format is pickle(.w2v), See [save_word2vec_format](https://radimrehurek.com/gensim/models/keyedvectors.html)
+
+
+## For Reproducibility
+
+We use [snakemake](https://snakemake.readthedocs.io/en/stable/) for reproducibility in the paper. Codes for experiment is under the workflow folder. <br>
+
+We have two workflows, a workflow for link prediction for persona2vec (node2vec) and a workflow for SPLITTER (baseline). You can easily run the worflow using command snakemake for each folder.
 
 ## Use as command line interface
 
