@@ -28,8 +28,7 @@ from persona2vec.model import Persona2Vec
 from persona2vec.utils import read_graph
 
 G = read_graph(NETWORK_FILE_NAME)
-model = Persona2Vec(
-    G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
+model = Persona2Vec(G, lambd=LAMBDA, dimensions=DIM, workers=NUMBER_OF_CORES)
 emb = model.embedding
 ```
 For detail, please check a example notebook, `examples/example_karate.ipynb`
