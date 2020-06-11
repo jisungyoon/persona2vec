@@ -1,6 +1,6 @@
 # persona2vec
 A simple implementation of persona2vec.
-For detail, please read persona2vec paper https://arxiv.org/abs/2006.04941
+For detail, please read persona2vec paper <br> https://arxiv.org/abs/2006.04941
 
 ## Installation
 You can use persona2vec as library. It is very simple.
