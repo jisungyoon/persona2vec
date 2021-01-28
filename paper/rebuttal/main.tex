@@ -1,0 +1,174 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{pslatex}
+\usepackage{color}
+\usepackage{bm}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\definecolor{orange}{RGB}{230, 81, 0}
+\definecolor{purple}{RGB}{170, 0, 255}
+\definecolor{mygreen}{RGB}{76, 175, 80}
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{210, 210, 210}
+
+\usepackage[most]{tcolorbox}
+\newcommand{\sada}[1]{{\leavevmode\color{orange}[SK: #1]}}
+\newcommand{\sadaadded}[1]{{\leavevmode\color{orange}{#1}}}
+\newcommand{\todo}[1]{{\leavevmode\color{orange}[TODO: #1]}}
+\newcommand{\add}[1]{{\leavevmode\color{blue}#1}}
+\newcommand{\del}[1]{{\leavevmode\color{red}\sout{#1}}}
+\newcommand{\response}[1]{{\leavevmode\noindent #1}}
+%\newcommand{\rcomment}[1]{{\bigskip\begin{snugshade}\begin{quotation}\noindent #1 \end{quotation}\end{snugshade} }}
+\newcommand{\rcomment}[1]{%
+\vspace{10pt}
+\begin{tcolorbox}[colback=black!3,colframe=white!45!black]
+#1
+\end{tcolorbox}
+}
+\newcommand{\correction}[2]{{\begin{quotation}\noindent {#1}{\it #2} \end{quotation} }}
+%\newcommand{\correction}[2]{{\bigskip\begin{quotation}\noindent {#1}{\it #2} \end{quotation} }}
+
+% comment out when submitting
+\definecolor{myblue}{RGB}{33,150,243}
+\definecolor{mygreen}{RGB}{76, 175, 80}
+\definecolor{purple}{RGB}{170, 0, 255}
+
+\makeatletter
+\renewcommand{\maketitle}{\bgroup\setlength{\parindent}{0pt}
+\begin{flushleft}
+\Large  \textbf{\@title}
+\end{flushleft}\egroup
+}
+\makeatother
+\title{Response to the review of submission\\  ``Persona2vec: A flexible multi-role representations learning framework for graphs''}
+\date{}
+\begin{document}
+\maketitle
+
+We would like to thank the editor and both reviewers.
+In the following, we provide detailed responses to the issues raised by the reviewers.
+The added and deleted sections of the main text are indicated by blue and red, respectively, in the annotated revised manuscript. 
+
+
+\section*{Response to Reviewer\#1}
+
+\response{%
+Thank you for the valuable comments. 
+In the following, we go through the review point-by-point and address the referee's concerns one by one.
+}
+
+\rcomment{%
+One thing I'd improve is in presenting the idea of multiple node embeddings more clearly. Specifically, it should be clearer the difference between this method and simply building different embeddings with different methods. In both cases we generate different vectors for the same node, but in persona2vec the different vectors aid the *same* task, while in the alternative, you build different vectors specialized to solve *different* tasks (structural equivalence vs clustering, for instance).
+}
+
+\response{%
+This is a good point. Tasks of both stages do not have to be same. In our experiment, for simplicity, \textit{persona2vec} generates the embedding using the \textit{word2vec} which optimizes the probability of a node $v_i$ co-occurring with a node $v_j$ estimated by
+\begin{equation}
+\label{eq:word2vec}
+p(v_{i} \vert v_{j}) = \frac{\exp(\bm{\Phi'}_{v_i} \cdot \bm{\Phi}_{v_{j}})}{\sum_{k=1}^V \exp(\bm{\Phi'}_{v_k} \cdot \bm{\Phi}_{v_{j}})},
+\end{equation}
+ where $\bm{\Phi}_{v_i}$ and $\bm{\Phi'}_{v_i}$ are the ``input'' and ``output'' embedding of node $i$. As we mentioned in the paper, any kind of graph embedding method can be considered, so we can introduce different tasks (or different optimization function as you suggested) in the phases of persona graph embedding.
+I think it's a great idea that can be used for future work.
+
+}
+
+\rcomment{%
+The experiments show some standard evaluation techniques for link prediction. I would love to see a couple of examples of predicted links -- picking a network and show the ten predictions with highest score and whether the nodes are actually connected. This is rarely done in link prediction papers, though.
+}
+
+\response{%
+JS:Do we need to show this?
+}
+
+\rcomment{%
+The main contribution vs the state of the art is the addition of persona edges and their weighting scheme. While this is shown to be effective in practice, I wonder whether this is significant enough. The improvement is statistically significant as shown in Table 2, but also relatively small in absolute terms.
+}
+
+\response{%
+Thank you for pointing these out.
+For each network, we generated ten different $E_{train}$ and $E_{test}$ and repeat the experiment five times for each ensemble, yielding fifty different experiment results for each method. Also, we report the standard error in Table.2, which is smaller than significant figures, $10^-3$ across all networks. Given that the result of the existing method is high already, we would say our improvement is significant enough.
+}
+
+
+\rcomment{%
+In general, I'm happy with the paper. I'm suggesting major revision instead of minor only for one reason, which I think might significantly impact some methods and/or require some additional experiments. Specifically: could the author use persona2vec for multilayer link prediction? In this case, interlayer coupling connections would provide some natural persona edges, but it'd be interesting to use a persona-like edge addition and weighting scheme to them (if we have n layers, do we connect all layers to all other layers in a clique fashion, or could we ignore some connections? Which weight should each coupling link have? Does it depend on the degree of the persona in a give layer?). There are some embedding based multilayer link predictors, along with some non-embedding ones.
+}
+
+\response{%
+The reviewer makes a very interesting point. We found similar papers on embedding with random walks on the multiplex network ( Liu, Weiyi, Pin-Yu Chen, Sailung Yeung, Toyotaro Suzumura, and Lingli Chen. "Principled multilayer network embedding." In 2017 IEEE International Conference on Data Mining Workshops (ICDMW), pp. 134-141. IEEE, 2017), but we think there is still room for improvement such as adding persona-like edges or setting the weight of edges. This point is also a good direction to pursue for future work.
+}
+
+\rcomment{%
+There are a couple of minor typos (line 101 "explores" should be "exploring", line 151 "shown" should be "shows"). Nothing that a simple proofread won't fix. The literature references are adequate. Figures and tables are of acceptable quality. Overall, the article of is of good quality.
+
+}
+
+\response{%
+Thanks for pointing typos. We did proofread several times and updated the manuscript accordingly.
+In summary,  we deeply appreciate the reviewer's careful reading of the paper and their interesting comments and ideas. We will consider those points for the future works.
+}
+
+\newpage
+
+\bigskip
+\section*{\bf Response to Reviewer \#2}
+
+\rcomment{%
+2. The whole organizations of the paper are confusing, e.g. the related work is before the conclusion. I would advise the authors to move it after the introduction section.
+}
+
+\response{%
+JS: Should we address it? I think it is different by fields.
+}
+
+\rcomment{%
+3. Regarding the Persona graph embedding section, the authors should show more details, from the current version, I cannot see any detailed formulas w.r.t. this section.
+}
+
+\response{%
+As explained in the paper,  any graph embedding algorithm that recognizes edge direction and weight can be readily applied to the persona graph. For simplicity, we choose the classical random-walker based embedding method (e.g.Node2Vec,DeepWalk). We specify detailed formula we used in the \emph{Optimization} section.
+
+
+}
+
+\rcomment{%
+4. A missed reference for graph embedding learning in CV community is 'region graph embedding for zero-shot learning published in ECCV20'
+}
+
+
+\response{%
+Thank you for pointing this out. We carefully read the papers and insert reference the paper into the introduction section.
+}
+
+\rcomment{%
+The overal novelty is neat, e.g., the idea of using multiple features for one node is new.
+One question is how to extend this idea to GCN formulation like in 'region graph embedding for zero-shot learning published in ECCV20'?
+}
+
+\response{%
+Thanks for the thoughtful comment! We are trying to expand persona ideas into a more recent algorithm: GCN on another project and made some promising results. We think it also can be applied in the field of computer vision because each region can also have multiple aspects related to the local structure between regions.
+}
+
+\rcomment{%
+1. The overall writing is good, however, there exist some typos, e.g.,
+
+it show -> it shows in L158, model -> models in L28, please proofread the whole paper again to modify them accordingly.
+}
+
+\response{%
+Thanks for pointing out some typos. We carefully proofread the whole paper and updated the paper.
+ In summary, we deeply appreciate the referee's thoughtful and constructive comments. 
+}
+
+%\bibliographystyle{unsrt}
+\bibliography{main.bib}
+
+
+\end{document}
