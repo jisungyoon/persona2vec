@@ -93,3 +93,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Data
+data/*
