@@ -61,18 +61,19 @@ class Persona2VecGCN(object):
         """
         Get the base embeddings from the original network
         """
-        self.base_model = DeepVGAE(
-            self.original_network,
-            self.original_network.number_of_nodes(),
-            self.directed,
-            self.hidden_dimensions,
-            self.dimensions,
-            self.lr,
-            self.val_size,
-            self.test_size,
-            self.epoch_base
-        )
-        self.base_embedding = self.base_model.learn_embedding()
+        pass
+#        self.base_model = DeepVGAE(
+#            self.original_network,
+#            self.original_network.number_of_nodes(),
+#            self.directed,
+#            self.hidden_dimensions,
+#            self.dimensions,
+#            self.lr,
+#            self.val_size,
+#            self.test_size,
+#            self.epoch_base
+#        )
+#        self.base_embedding = self.base_model.learn_embedding()
 
     def generate_persona_network(self):
         """
