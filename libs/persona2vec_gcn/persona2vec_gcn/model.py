@@ -8,9 +8,9 @@ from persona2vec_gcn.vgae import DeepVGAE
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 
-class Persona2Vec(object):
+class Persona2VecGCN(object):
     """
-    Persona2Vec node embedding object
+    Persona2Vec graph neural network object
     """
 
     def __init__(
@@ -44,7 +44,7 @@ class Persona2Vec(object):
         self.lambd = lambd
         self.clustering_method = clustering_method
         self.directed = directed
-        
+
         self.lr = lr
         self.epoch_base = epoch_base
         self.epoch_persona = epoch_persona
