@@ -101,6 +101,7 @@ class DeepVGAE:
     def __init__(
         self,
         G,
+        X,
         num_features=None,
         directed=False,
         hidden_dimensions=256,
@@ -112,6 +113,7 @@ class DeepVGAE:
     ):
         """
         :param G: NetworkX graph object.
+        :param X: Node feature matrix with shape (n_nodes,n_features). Numpy Array. The rows should be ordered in order of G.nodes().
         :param num_features: Number of features for node else number of nodes
         :param directed: Directed network(True) or undirected network(False)
         :param hidden_dimensions: Hidden dimension of encoder
@@ -122,6 +124,7 @@ class DeepVGAE:
         :param epochs: Number of epochs
         """
         self.G = G
+        self.X = X
         self.directed = directed
 
         # parameters for VGAE model
@@ -154,7 +157,7 @@ class DeepVGAE:
         Converting networkx.Graph() object to torch_geometric.data.Data
         """
         self.data = from_networkx(self.G)
-        self.data.x = torch.from_numpy(csr_matrix.toarray(nx.adjacency_matrix(self.G))).float()
+        self.data.x = torch.from_numpy(self.X).float()
 
     def learn_embedding(self):
         """
@@ -162,6 +165,7 @@ class DeepVGAE:
         """
         torch.manual_seed(12345)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model.to(device)
         all_edge_index = self.data.edge_index
         self.data = train_test_split_edges(self.data, self.val_size, self.test_size)
 

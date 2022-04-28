@@ -16,6 +16,7 @@ class Persona2VecGCN(object):
     def __init__(
         self,
         G,
+        X,
         lambd=0.5,
         clustering_method="connected_component",
         directed=False,
@@ -29,6 +30,7 @@ class Persona2VecGCN(object):
     ):
         """
         :param G: NetworkX graph object. persona graah
+        :param X: node features. numpy array
         :param lambd: edge weight for persona edge, usually 0 ~ 1
         :param clustering_method: name of the clustering method that uses in splitting personas, choose one of these ('connected_component''modulairty','label_prop')
         :param directed: Directed network(True) or undirected network(False)
@@ -41,6 +43,7 @@ class Persona2VecGCN(object):
         :param test_size: Fraction of the data to be used as test data
         """
         self.original_network = G
+        self.X = X
         self.lambd = lambd
         self.clustering_method = clustering_method
         self.directed = directed
@@ -62,18 +65,6 @@ class Persona2VecGCN(object):
         Get the base embeddings from the original network
         """
         pass
-#        self.base_model = DeepVGAE(
-#            self.original_network,
-#            self.original_network.number_of_nodes(),
-#            self.directed,
-#            self.hidden_dimensions,
-#            self.dimensions,
-#            self.lr,
-#            self.val_size,
-#            self.test_size,
-#            self.epoch_base
-#        )
-#        self.base_embedding = self.base_model.learn_embedding()
 
     def generate_persona_network(self):
         """
@@ -94,7 +85,8 @@ class Persona2VecGCN(object):
         Get the persona embeddings from the persona network starts from base embeding
         """
         self.persona_model = DeepVGAE(
-            self.persona_network,
+            G=self.persona_network,
+            X=self.X,
             num_features=None,
             directed=True,
             hidden_dimensions=self.hidden_dimensions,
