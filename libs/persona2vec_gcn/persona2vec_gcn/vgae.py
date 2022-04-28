@@ -134,7 +134,7 @@ class DeepVGAE:
         self.epochs = epochs
         self.val_size = val_size
         self.test_size = test_size
-        
+
         # declaring model object
         self.model = VariationalAutoEncoder(
             self.num_features,
@@ -142,10 +142,10 @@ class DeepVGAE:
             self.dimensions
         )
         self.optimizer = Adam(self.model.parameters(), lr=self.lr)
-        
+
         self.gen_node_mappings()
         self.network_to_data()
-    
+
     def gen_node_mappings(self):
         self.node_mappings = {node: i for i, node in enumerate(self.G)}
 
@@ -155,7 +155,7 @@ class DeepVGAE:
         """
         self.data = from_networkx(self.G)
         self.data.x = torch.from_numpy(csr_matrix.toarray(nx.adjacency_matrix(self.G))).float()
-    
+
     def learn_embedding(self):
         """
         Training the VGAE model on given network and generating embeddings.
@@ -163,27 +163,26 @@ class DeepVGAE:
         torch.manual_seed(12345)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         all_edge_index = self.data.edge_index
-        print(self.data.x.type(), all_edge_index.type())
         self.data = train_test_split_edges(self.data, self.val_size, self.test_size)
-        
+
         for epoch in range(self.epochs):
             self.model.train()
             self.optimizer.zero_grad()
             loss = self.model.loss(self.data.x, self.data.train_pos_edge_index, all_edge_index)
             loss.backward()
             self.optimizer.step()
-            
+
             self.model.eval()
             roc_auc, ap = self.model.single_test(self.data.x,
                                                  self.data.train_pos_edge_index,
                                                  self.data.test_pos_edge_index,
                                                  self.data.test_neg_edge_index)
             print("Epoch {} - Loss: {} ROC_AUC: {} Precision: {}".format(epoch, loss.cpu().item(), roc_auc, ap))
-        
+
         emb = self.model.encode(self.data.x, all_edge_index).cpu().detach().numpy().tolist()
         self.embedding = { node: emb[self.node_mappings[node]] for node in self.G.nodes() }
         return self.embedding
-    
+
     def save_embedding(self, file_path):
         """
         :param file_path: file path to store the embeddings of the model
@@ -193,20 +192,20 @@ class DeepVGAE:
             self.learn_embedding()
         with open(file_path, "w") as f:
             json.dump(self.embedding, f)
-    
-    
+
+
 # Ignore below code. It is just used for testing the model
 if __name__=='__main__':
-    
+
     G = read_graph("data/ppi.elist")
     model = DeepVGAE(G)
     print(model.learn_embedding())
     model.save_embedding("data/embeddings/test_emb.pkl")
-    
+
 #     # importing dataset related functions
 #     from torch_geometric.datasets import Planetoid, PPI
 #     import torch_geometric.transforms as T
-    
+
 #     # Parameters are set as per benchmarking GNN paper: https://arxiv.org/pdf/2102.12557.pdf
 #     args = {
 #         "enc_in_channels": 50,
@@ -217,10 +216,10 @@ if __name__=='__main__':
 #         "val_size": 0.05,
 #         "test_size": 0.1
 #     }
-    
+
 #     torch.manual_seed(12345)
 #     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
+
 #     model = VariationalAutoEncoder(
 #         args["enc_in_channels"],
 #         args["enc_hidden_channels"],
@@ -233,14 +232,14 @@ if __name__=='__main__':
 #     all_edge_index = data.edge_index
 #     data = train_test_split_edges(data, args["val_size"], args["test_size"])
 #     print(data.x.type(), all_edge_index.type())
-    
+
 #     for epoch in range(args["epoch"]):
 #         model.train()
 #         optimizer.zero_grad()
 #         loss = model.loss(data.x, data.train_pos_edge_index, all_edge_index)
 #         loss.backward()
 #         optimizer.step()
-        
+
 #         model.eval()
 #         roc_auc, ap = model.single_test(data.x,
 #                                         data.train_pos_edge_index,
