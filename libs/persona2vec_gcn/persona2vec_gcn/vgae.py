@@ -9,7 +9,12 @@ from torch.optim import Adam
 
 from torch_geometric.nn.models import InnerProductDecoder, VGAE
 from torch_geometric.nn.conv import GCNConv
-from torch_geometric.utils import from_networkx, negative_sampling, remove_self_loops, add_self_loops
+from torch_geometric.utils import (
+    from_networkx,
+    negative_sampling,
+    remove_self_loops,
+    add_self_loops,
+)
 from torch_geometric.utils import train_test_split_edges
 
 import networkx as nx
@@ -21,6 +26,7 @@ class GCNEncoder(nn.Module):
     """
     Encoder which uses Graph Convolution modules.
     """
+
     def __init__(self, in_channels, hidden_channels, out_channels):
         super(GCNEncoder, self).__init__()
         # print(type(in_channels), type(hidden_channels), type(out_channels))
@@ -40,11 +46,12 @@ class VariationalAutoEncoder(VGAE):
     """
     Variational Graph Auto-Encoder: https://arxiv.org/abs/1611.07308
     """
+
     def __init__(self, enc_in_channels, enc_hidden_channels, enc_out_channels):
-        super(VariationalAutoEncoder, self).__init__(encoder=GCNEncoder(enc_in_channels,
-                                                          enc_hidden_channels,
-                                                          enc_out_channels),
-                                                     decoder=InnerProductDecoder())
+        super(VariationalAutoEncoder, self).__init__(
+            encoder=GCNEncoder(enc_in_channels, enc_hidden_channels, enc_out_channels),
+            decoder=InnerProductDecoder(),
+        )
 
     def forward(self, x, edge_index):
         z = self.encode(x, edge_index)
@@ -55,23 +62,32 @@ class VariationalAutoEncoder(VGAE):
         z = self.encode(x, pos_edge_index)
 
         pos_loss = -torch.log(
-            self.decoder(z, pos_edge_index, sigmoid=True) + 1e-15).mean()
+            self.decoder(z, pos_edge_index, sigmoid=True) + 1e-15
+        ).mean()
 
         # Do not include self-loops in negative samples
         all_edge_index_tmp, _ = remove_self_loops(all_edge_index)
         all_edge_index_tmp, _ = add_self_loops(all_edge_index_tmp)
 
-        neg_edge_index = negative_sampling(all_edge_index_tmp, z.size(0), pos_edge_index.size(1))
-        neg_loss = -torch.log(1 - self.decoder(z, neg_edge_index, sigmoid=True) + 1e-15).mean()
+        neg_edge_index = negative_sampling(
+            all_edge_index_tmp, z.size(0), pos_edge_index.size(1)
+        )
+        neg_loss = -torch.log(
+            1 - self.decoder(z, neg_edge_index, sigmoid=True) + 1e-15
+        ).mean()
 
         kl_loss = 1 / x.size(0) * self.kl_loss()
 
         return pos_loss + neg_loss + kl_loss
 
-    def single_test(self, x, train_pos_edge_index, test_pos_edge_index, test_neg_edge_index):
+    def single_test(
+        self, x, train_pos_edge_index, test_pos_edge_index, test_neg_edge_index
+    ):
         with torch.no_grad():
             z = self.encode(x, train_pos_edge_index)
-        roc_auc_score, average_precision_score = self.test(z, test_pos_edge_index, test_neg_edge_index)
+        roc_auc_score, average_precision_score = self.test(
+            z, test_pos_edge_index, test_neg_edge_index
+        )
         return roc_auc_score, average_precision_score
 
 
@@ -79,6 +95,7 @@ class DeepVGAE:
     """
     Deep Variational Auto-Encoder node embedding object
     """
+
     def __init__(
         self,
         G,
@@ -89,7 +106,7 @@ class DeepVGAE:
         lr=0.01,
         val_size=0.05,
         test_size=0.1,
-        epochs=10
+        epochs=10,
     ):
         """
         :param G: NetworkX graph object.
@@ -120,9 +137,7 @@ class DeepVGAE:
 
         # declaring model object
         self.model = VariationalAutoEncoder(
-            self.num_features,
-            self.hidden_dimensions,
-            self.dimensions
+            self.num_features, self.hidden_dimensions, self.dimensions
         )
         self.optimizer = Adam(self.model.parameters(), lr=self.lr)
 
@@ -144,7 +159,7 @@ class DeepVGAE:
         Training the VGAE model on given network and generating embeddings.
         """
         torch.manual_seed(12345)
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(device)
         self.data.to(device)
 
@@ -154,19 +169,35 @@ class DeepVGAE:
         for epoch in range(self.epochs):
             self.model.train()
             self.optimizer.zero_grad()
-            loss = self.model.loss(self.data.x, self.data.train_pos_edge_index, all_edge_index)
+            loss = self.model.loss(
+                self.data.x, self.data.train_pos_edge_index, all_edge_index
+            )
             loss.backward()
             self.optimizer.step()
 
             self.model.eval()
-            roc_auc, ap = self.model.single_test(self.data.x,
-                                                 self.data.train_pos_edge_index,
-                                                 self.data.test_pos_edge_index,
-                                                 self.data.test_neg_edge_index)
-            print("Epoch {} - Loss: {} ROC_AUC: {} Precision: {}".format(epoch, loss.cpu().item(), roc_auc, ap))
+            roc_auc, ap = self.model.single_test(
+                self.data.x,
+                self.data.train_pos_edge_index,
+                self.data.test_pos_edge_index,
+                self.data.test_neg_edge_index,
+            )
+            print(
+                "Epoch {} - Loss: {} ROC_AUC: {} Precision: {}".format(
+                    epoch, loss.cpu().item(), roc_auc, ap
+                )
+            )
 
-        emb = self.model.encode(self.data.x, all_edge_index).cpu().detach().numpy().tolist()
-        self.embedding = { node: emb[self.node_mappings[node]] for node in self.G.nodes() }
+        emb = (
+            self.model.encode(self.data.x, all_edge_index)
+            .cpu()
+            .detach()
+            .numpy()
+            .tolist()
+        )
+        self.embedding = {
+            node: emb[self.node_mappings[node]] for node in self.G.nodes()
+        }
         return self.embedding
 
     def save_embedding(self, file_path):
@@ -181,7 +212,7 @@ class DeepVGAE:
 
 
 # Ignore below code. It is just used for testing the model
-if __name__=='__main__':
+if __name__ == "__main__":
 
     G = utils.read_graph("data/ppi.elist")
     model = DeepVGAE(G)

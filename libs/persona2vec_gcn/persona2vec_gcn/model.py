@@ -27,7 +27,7 @@ class Persona2VecGCN(object):
         epoch_base=10,
         epoch_persona=10,
         val_size=0.05,
-        test_size=0.1
+        test_size=0.1,
     ):
         """
         :param G: NetworkX graph object. persona graah
@@ -85,8 +85,15 @@ class Persona2VecGCN(object):
         """
         Get the persona embeddings from the persona network starts from base embeding
         """
-        toNodeID={node:node_id for node_id, node in enumerate(self.original_network.nodes())}
-        node_ids=np.array([toNodeID[self.persona_to_node[persona]] for persona in self.persona_network.nodes()])
+        toNodeID = {
+            node: node_id for node_id, node in enumerate(self.original_network.nodes())
+        }
+        node_ids = np.array(
+            [
+                toNodeID[self.persona_to_node[persona]]
+                for persona in self.persona_network.nodes()
+            ]
+        )
         X_persona = self.X[node_ids, :]
 
         self.persona_model = DeepVGAE(
@@ -98,7 +105,7 @@ class Persona2VecGCN(object):
             lr=self.lr,
             val_size=self.val_size,
             test_size=self.test_size,
-            epochs=self.epoch_persona
+            epochs=self.epoch_persona,
         )
         self.embedding = self.persona_model.learn_embedding()
 

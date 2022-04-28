@@ -3,6 +3,7 @@ import numpy as np
 from . import utils
 from sklearn.decomposition import TruncatedSVD
 
+
 def fastRP(G, dimensions, steps=10):
     """https://arxiv.org/pdf/1908.11512.pdf."""
     A = utils.to_adjacency_matrix(G)
@@ -24,6 +25,7 @@ def fastRP(G, dimensions, steps=10):
         S = normalized_conv_matrix @ S
     S /= np.maximum(1, steps)
     return S
+
 
 def laplacian_eigenmap(G, dimensions):
     A = utils.to_adjacency_matrix(G)

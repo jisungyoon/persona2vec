@@ -1,5 +1,6 @@
 import sys
-sys.path.append('.')
+
+sys.path.append(".")
 
 import argparse
 
@@ -77,57 +78,54 @@ def parse_args():
         "--hidden-dimensions",
         type=int,
         default=256,
-        help="Number of hidden dimensions for encoder. Default is 256."
+        help="Number of hidden dimensions for encoder. Default is 256.",
     )
-    
+
     parser.add_argument(
         "--dimensions",
         type=int,
         default=128,
         help="Number of dimensions. Default is 128.",
     )
-    
+
     parser.add_argument(
-        "--lr",
-        type=float,
-        default=0.01,
-        help="Learning rate. Default is 0.01"
+        "--lr", type=float, default=0.01, help="Learning rate. Default is 0.01"
     )
-    
+
     parser.add_argument(
         "--val-size",
         type=float,
         default=0.05,
-        help="Fraction of validation size. Default is 0.05"
+        help="Fraction of validation size. Default is 0.05",
     )
-    
+
     parser.add_argument(
         "--test-size",
         type=float,
         default=0.1,
-        help="Fraction of test size. Default is 0.1"
+        help="Fraction of test size. Default is 0.1",
     )
 
-#     parser.add_argument(
-#         "--walk-length-base",
-#         type=int,
-#         default=40,
-#         help="Length of walk per source. Default is 40.",
-#     )
+    #     parser.add_argument(
+    #         "--walk-length-base",
+    #         type=int,
+    #         default=40,
+    #         help="Length of walk per source. Default is 40.",
+    #     )
 
-#     parser.add_argument(
-#         "--num-walks-base",
-#         type=int,
-#         default=10,
-#         help="Number of walks per source. Default is 10.",
-#     )
+    #     parser.add_argument(
+    #         "--num-walks-base",
+    #         type=int,
+    #         default=10,
+    #         help="Number of walks per source. Default is 10.",
+    #     )
 
-#     parser.add_argument(
-#         "--window-size-base",
-#         type=int,
-#         default=5,
-#         help="Context size for optimization. Default is 5.",
-#     )
+    #     parser.add_argument(
+    #         "--window-size-base",
+    #         type=int,
+    #         default=5,
+    #         help="Context size for optimization. Default is 5.",
+    #     )
 
     parser.add_argument(
         "--epoch-base",
@@ -136,26 +134,26 @@ def parse_args():
         help="Number of epochs in the base embedding",
     )
 
-#     parser.add_argument(
-#         "--walk-length-persona",
-#         type=int,
-#         default=80,
-#         help="Length of walk per source. Default is 80.",
-#     )
+    #     parser.add_argument(
+    #         "--walk-length-persona",
+    #         type=int,
+    #         default=80,
+    #         help="Length of walk per source. Default is 80.",
+    #     )
 
-#     parser.add_argument(
-#         "--num-walks-persona",
-#         type=int,
-#         default=5,
-#         help="Number of walks per source. Default is 10.",
-#     )
+    #     parser.add_argument(
+    #         "--num-walks-persona",
+    #         type=int,
+    #         default=5,
+    #         help="Number of walks per source. Default is 10.",
+    #     )
 
-#     parser.add_argument(
-#         "--window-size-persona",
-#         type=int,
-#         default=2,
-#         help="Context size for optimization. Default is 10.",
-#     )
+    #     parser.add_argument(
+    #         "--window-size-persona",
+    #         type=int,
+    #         default=2,
+    #         help="Context size for optimization. Default is 10.",
+    #     )
 
     parser.add_argument(
         "--epoch-persona",
@@ -164,19 +162,19 @@ def parse_args():
         help="Number of epochs in persona embedding",
     )
 
-#     parser.add_argument(
-#         "--p",
-#         type=float,
-#         default=1,
-#         help="Return hyperparameter for random-walker. Default is 1.",
-#     )
+    #     parser.add_argument(
+    #         "--p",
+    #         type=float,
+    #         default=1,
+    #         help="Return hyperparameter for random-walker. Default is 1.",
+    #     )
 
-#     parser.add_argument(
-#         "--q",
-#         type=float,
-#         default=1,
-#         help="Inout hyperparameter for random-walker. Default is 1.",
-#     )
+    #     parser.add_argument(
+    #         "--q",
+    #         type=float,
+    #         default=1,
+    #         help="Inout hyperparameter for random-walker. Default is 1.",
+    #     )
 
     # computation configuration
     # parser.add_argument(
@@ -229,7 +227,7 @@ def main():
         epoch_base=args.epoch_base,
         epoch_persona=args.epoch_persona,
         val_size=args.val_size,
-        test_size=args.test_size
+        test_size=args.test_size,
     )
 
     model.save_persona_network(args.persona_network)
