@@ -83,7 +83,6 @@ class DeepVGAE:
         self,
         G,
         X,
-        num_features=None,
         directed=False,
         hidden_dimensions=256,
         dimensions=128,
@@ -109,7 +108,7 @@ class DeepVGAE:
         self.directed = directed
 
         # parameters for VGAE model
-        self.num_features = num_features if num_features else self.G.number_of_nodes()
+        self.num_features = X.shape[1]
         self.hidden_dimensions = hidden_dimensions
         self.dimensions = dimensions
 

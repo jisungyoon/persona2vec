@@ -92,7 +92,6 @@ class Persona2VecGCN(object):
         self.persona_model = DeepVGAE(
             G=self.persona_network,
             X=X_persona,
-            num_features=X_persona.shape[1],
             directed=True,
             hidden_dimensions=self.hidden_dimensions,
             dimensions=self.dimensions,
