@@ -8,9 +8,9 @@ from persona2vec_gcn.vgae import DeepVGAE
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 
 
-class Persona2Vec(object):
+class Persona2VecGCN(object):
     """
-    Persona2Vec node embedding object
+    Persona2Vec graph neural network object
     """
 
     def __init__(
@@ -44,7 +44,7 @@ class Persona2Vec(object):
         self.lambd = lambd
         self.clustering_method = clustering_method
         self.directed = directed
-        
+
         self.lr = lr
         self.epoch_base = epoch_base
         self.epoch_persona = epoch_persona
@@ -61,18 +61,19 @@ class Persona2Vec(object):
         """
         Get the base embeddings from the original network
         """
-        self.base_model = DeepVGAE(
-            self.original_network,
-            self.original_network.number_of_nodes(),
-            self.directed,
-            self.hidden_dimensions,
-            self.dimensions,
-            self.lr,
-            self.val_size,
-            self.test_size,
-            self.epoch_base
-        )
-        self.base_embedding = self.base_model.learn_embedding()
+        pass
+#        self.base_model = DeepVGAE(
+#            self.original_network,
+#            self.original_network.number_of_nodes(),
+#            self.directed,
+#            self.hidden_dimensions,
+#            self.dimensions,
+#            self.lr,
+#            self.val_size,
+#            self.test_size,
+#            self.epoch_base
+#        )
+#        self.base_embedding = self.base_model.learn_embedding()
 
     def generate_persona_network(self):
         """
