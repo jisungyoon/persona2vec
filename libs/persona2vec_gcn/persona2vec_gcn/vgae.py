@@ -166,6 +166,8 @@ class DeepVGAE:
         torch.manual_seed(12345)
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.to(device)
+        self.data.to(device)
+
         all_edge_index = self.data.edge_index
         self.data = train_test_split_edges(self.data, self.val_size, self.test_size)
 

@@ -85,14 +85,14 @@ class Persona2VecGCN(object):
         """
         Get the persona embeddings from the persona network starts from base embeding
         """
-        toNodeID={node:node_id for node_id, node in enumerate(self.G.nodes())}
+        toNodeID={node:node_id for node_id, node in enumerate(self.original_network.nodes())}
         node_ids=np.array([toNodeID[self.persona_to_node[persona]] for persona in self.persona_network.nodes()])
         X_persona = self.X[node_ids, :]
 
         self.persona_model = DeepVGAE(
             G=self.persona_network,
             X=X_persona,
-            num_features=None,
+            num_features=X_persona.shape[1],
             directed=True,
             hidden_dimensions=self.hidden_dimensions,
             dimensions=self.dimensions,
