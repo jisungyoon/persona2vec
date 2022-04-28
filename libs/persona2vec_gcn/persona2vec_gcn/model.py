@@ -139,5 +139,3 @@ class Persona2VecGCN(object):
         :return:
         """
         self.persona_model.save_embedding(file_path)
-
-# %%

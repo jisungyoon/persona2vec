@@ -1,5 +1,6 @@
 import json
 import os
+from . import utils
 
 import torch
 import torch.nn as nn
@@ -14,26 +15,6 @@ from torch_geometric.utils import train_test_split_edges
 import networkx as nx
 import numpy as np
 from scipy.sparse import csr_matrix
-
-def read_graph(input_file_path, weighted=False, directed=False):
-    """
-    Reads the input network and return a networkx Graph object.
-    :param input_file_path: File path of input graph
-    :param weighted: weighted network(True) or unweighted network(False)
-    :param directed: directed network(True) or undirected network(False)
-    :return G: output network
-    """
-    if weighted:
-        G = nx.read_edgelist(input_file_path, nodetype=str, create_using=nx.DiGraph(),)
-    else:
-        G = nx.read_edgelist(input_file_path, nodetype=str, create_using=nx.DiGraph())
-        for edge in G.edges():
-            G[edge[0]][edge[1]]["weight"] = 1
-
-    if not directed:
-        G = G.to_undirected()
-
-    return G
 
 
 class GCNEncoder(nn.Module):
@@ -203,7 +184,7 @@ class DeepVGAE:
 # Ignore below code. It is just used for testing the model
 if __name__=='__main__':
 
-    G = read_graph("data/ppi.elist")
+    G = utils.read_graph("data/ppi.elist")
     model = DeepVGAE(G)
     print(model.learn_embedding())
     model.save_embedding("data/embeddings/test_emb.pkl")
