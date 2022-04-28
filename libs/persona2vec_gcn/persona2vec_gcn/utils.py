@@ -2,7 +2,7 @@ import csv
 import errno
 import logging
 import os
-
+from scipy import sparse
 import networkx as nx
 import numpy as np
 from texttable import Texttable
@@ -71,3 +71,15 @@ def read_edge_file(file_path):
         data = list(map(tuple, reader))
     return data
 
+#
+# Homogenize the data format
+#
+def to_adjacency_matrix(net):
+    if sparse.issparse(net):
+        if type(net) == "scipy.sparse.csr.csr_matrix":
+            return net
+        return sparse.csr_matrix(net)
+    elif "networkx" in "%s" % type(net):
+        return nx.adjacency_matrix(net)
+    elif "numpy.ndarray" == type(net):
+        return sparse.csr_matrix(net)
