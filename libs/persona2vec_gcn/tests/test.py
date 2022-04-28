@@ -1,7 +1,7 @@
 import unittest
 
 from persona2vec_gcn.model import Persona2VecGCN
-from persona2vec_gcn.utils import read_graph
+from persona2vec_gcn.vgae import DeepVGAE
 import numpy as np
 import networkx as nx
 
@@ -21,6 +21,13 @@ class TestPersona2VecGCN(unittest.TestCase):
         dimensions = 64
         model = Persona2VecGCN(self.G, X = self.A.toarray(), lambd=0.1, dimensions = dimensions, clustering_method="modularity")
         model = Persona2VecGCN(self.G, X = self.A.toarray(), lambd=0.1, dimensions = dimensions, clustering_method="label_prop")
+
+    def test_deepvgae(self):
+        dimensions = 64
+        model = DeepVGAE(self.G, dimensions=dimensions)
+        model.learn_embedding()
+        emb = np.vstack(model.embedding.values())
+        assert emb.shape[1] == dimensions
 
 if __name__ == "__main__":
     unittest.main()
